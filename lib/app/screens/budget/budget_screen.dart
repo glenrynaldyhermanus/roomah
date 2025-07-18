@@ -64,10 +64,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
   }
 
   void _showAddBudgetDialog(BuildContext context) {
-    final _nameController = TextEditingController();
-    final _amountController = TextEditingController();
-    DateTime? _startDate;
-    DateTime? _endDate;
+    final nameController = TextEditingController();
+    final amountController = TextEditingController();
+    DateTime? startDate;
+    DateTime? endDate;
 
     showDialog(
       context: context,
@@ -78,11 +78,11 @@ class _BudgetScreenState extends State<BudgetScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: _nameController,
+                controller: nameController,
                 decoration: const InputDecoration(hintText: 'Enter budget name'),
               ),
               TextField(
-                controller: _amountController,
+                controller: amountController,
                 decoration:
                     const InputDecoration(hintText: 'Enter budget amount'),
                 keyboardType: TextInputType.number,
@@ -100,10 +100,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
             TextButton(
               onPressed: () {
                 context.read<BudgetBloc>().add(AddBudget(
-                      name: _nameController.text,
-                      amount: double.parse(_amountController.text),
-                      startDate: _startDate ?? DateTime.now(),
-                      endDate: _endDate ?? DateTime.now().add(const Duration(days: 30)),
+                      name: nameController.text,
+                      amount: double.parse(amountController.text),
+                      startDate: startDate ?? DateTime.now(),
+                      endDate: endDate ?? DateTime.now().add(const Duration(days: 30)),
                     ));
                 Navigator.of(context).pop();
               },

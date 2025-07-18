@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:myapp/app/blocs/todo/todo_bloc.dart';
-import 'package:myapp/app/models/todo_item.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class TodoScreen extends StatefulWidget {
