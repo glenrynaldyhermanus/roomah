@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp.router(
-        title: 'My App',
+        title: 'Roomah',
         routerConfig: router,
         builder: (context, child) {
           return NeumorphicTheme(
