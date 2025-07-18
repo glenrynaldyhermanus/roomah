@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:myapp/app/screens/budget/budget_screen.dart';
 import 'package:myapp/app/screens/calendar/calendar_screen.dart';
 import 'package:myapp/app/screens/dashboard/dashboard_screen.dart';
 import 'package:myapp/app/screens/finance/finance_screen.dart';
@@ -22,10 +21,6 @@ class AppRouter {
           GoRoute(
             path: '/todo',
             builder: (context, state) => const TodoScreen(),
-          ),
-          GoRoute(
-            path: '/budget',
-            builder: (context, state) => const BudgetScreen(),
           ),
           GoRoute(
             path: '/calendar',

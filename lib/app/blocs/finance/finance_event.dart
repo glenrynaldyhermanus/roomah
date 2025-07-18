@@ -1,15 +1,15 @@
-part of 'transaction_bloc.dart';
+part of 'finance_bloc.dart';
 
-abstract class TransactionEvent extends Equatable {
-  const TransactionEvent();
+abstract class FinanceEvent extends Equatable {
+  const FinanceEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class FetchTransactions extends TransactionEvent {}
+class FetchTransactions extends FinanceEvent {}
 
-class AddTransaction extends TransactionEvent {
+class AddTransaction extends FinanceEvent {
   final double amount;
   final String type;
   final String? description;

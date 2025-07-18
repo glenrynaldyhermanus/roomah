@@ -3,46 +3,46 @@ import 'package:equatable/equatable.dart';
 import 'package:myapp/app/models/transaction.dart';
 import 'package:myapp/app/services/supabase_service.dart';
 
-part 'transaction_event.dart';
-part 'transaction_state.dart';
+part 'finance_event.dart';
+part 'finance_state.dart';
 
-class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
-  TransactionBloc() : super(TransactionInitial()) {
+class FinanceBloc extends Bloc<FinanceEvent, FinanceState> {
+  FinanceBloc() : super(FinanceInitial()) {
     on<FetchTransactions>(_onFetchTransactions);
     on<AddTransaction>(_onAddTransaction);
   }
 
   Future<void> _onFetchTransactions(
-      FetchTransactions event, Emitter<TransactionState> emit) async {
-    emit(TransactionLoading());
+      FetchTransactions event, Emitter<FinanceState> emit) async {
+    emit(FinanceLoading());
     try {
-      final response = await SupabaseService.client.from('transactions').select();
+      final response = await SupabaseService.client.from('finances').select();
       final transactions =
           (response as List).map((json) => Transaction.fromJson(json)).toList();
-      emit(TransactionLoaded(transactions));
+      emit(FinanceLoaded(transactions));
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(FinanceError(e.toString()));
     }
   }
 
   Future<void> _onAddTransaction(
-      AddTransaction event, Emitter<TransactionState> emit) async {
+      AddTransaction event, Emitter<FinanceState> emit) async {
     try {
-      final response = await SupabaseService.client.from('transactions').insert({
+      final response = await SupabaseService.client.from('finances').insert({
         'amount': event.amount,
         'type': event.type,
         'description': event.description,
         'transaction_date': event.transactionDate.toIso8601String(),
       }).select();
       final newTransaction = Transaction.fromJson(response[0]);
-      if (state is TransactionLoaded) {
+      if (state is FinanceLoaded) {
         final updatedTransactions =
-            List<Transaction>.from((state as TransactionLoaded).transactions)
+            List<Transaction>.from((state as FinanceLoaded).transactions)
               ..add(newTransaction);
-        emit(TransactionLoaded(updatedTransactions));
+        emit(FinanceLoaded(updatedTransactions));
       }
     } catch (e) {
-      emit(TransactionError(e.toString()));
+      emit(FinanceError(e.toString()));
     }
   }
 }
