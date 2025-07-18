@@ -10,18 +10,10 @@ abstract class FinanceEvent extends Equatable {
 class FetchTransactions extends FinanceEvent {}
 
 class AddTransaction extends FinanceEvent {
-  final double amount;
-  final String type;
-  final String? description;
-  final DateTime transactionDate;
+  final Transaction transaction;
 
-  const AddTransaction({
-    required this.amount,
-    required this.type,
-    this.description,
-    required this.transactionDate,
-  });
+  const AddTransaction(this.transaction);
 
   @override
-  List<Object> get props => [amount, type, transactionDate];
+  List<Object> get props => [transaction];
 }

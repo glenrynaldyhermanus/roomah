@@ -13,11 +13,12 @@ class TodoLoading extends TodoState {}
 
 class TodoLoaded extends TodoState {
   final List<Todo> todos;
+  final List<Todo> completedTodos;
 
-  const TodoLoaded(this.todos);
+  const TodoLoaded({this.todos = const [], this.completedTodos = const []});
 
   @override
-  List<Object> get props => [todos];
+  List<Object> get props => [todos, completedTodos];
 }
 
 class TodoError extends TodoState {

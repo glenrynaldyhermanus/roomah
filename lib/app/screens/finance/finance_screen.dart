@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:myapp/app/blocs/finance/finance_bloc.dart';
-import 'package:myapp/app/themes/app_theme.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class FinanceScreen extends StatefulWidget {
@@ -19,20 +18,16 @@ class _FinanceScreenState extends State<FinanceScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    // Add a listener to rebuild the widget when the tab changes.
-    // This ensures the NeumorphicToggle's style updates correctly.
     _tabController.addListener(() {
       if (mounted) {
         setState(() {});
       }
     });
-    // Fetch initial data
     context.read<FinanceBloc>().add(FetchTransactions());
   }
 
   @override
   void dispose() {
-    // It's good practice to remove the listener, though dispose() also handles it.
     _tabController.removeListener(() {});
     _tabController.dispose();
     super.dispose();
@@ -63,7 +58,7 @@ class _FinanceScreenState extends State<FinanceScreen>
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: _tabController.index == 0
-                            ? AppTheme.textColor
+                            ? NeumorphicTheme.defaultTextColor(context)
                             : Colors.grey.shade600,
                       ),
                     ),
@@ -76,7 +71,7 @@ class _FinanceScreenState extends State<FinanceScreen>
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: _tabController.index == 1
-                            ? AppTheme.textColor
+                            ? NeumorphicTheme.defaultTextColor(context)
                             : Colors.grey.shade600,
                       ),
                     ),
@@ -85,7 +80,7 @@ class _FinanceScreenState extends State<FinanceScreen>
               ],
               thumb: Neumorphic(
                 style: NeumorphicStyle(
-                  color: AppTheme.accentColor,
+                  color: NeumorphicTheme.accentColor(context),
                   boxShape: NeumorphicBoxShape.roundRect(
                       const BorderRadius.all(Radius.circular(12))),
                 ),

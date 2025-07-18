@@ -1,13 +1,51 @@
-
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:myapp/app/models/todo_item.dart';
+import 'package:myapp/app/models/transaction.dart';
 
 class SupabaseService {
-  static Future<void> initialize() async {
-    await Supabase.initialize(
-      url: 'https://fcqehsciylskujjtqvxw.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcWVoc2NpeWxza3VqanRxdnh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzUyNjAsImV4cCI6MjA2ODQxMTI2MH0.5vCzfyqIwTeQyBYVkHTTJVK0ObymT4YqvNu9L_XX7vY',
-    );
+  final SupabaseClient _client = Supabase.instance.client;
+
+  Future<List<Transaction>> getTransactions() async {
+    final data = await _client.from('transactions').select();
+    return (data as List).map((json) => Transaction.fromJson(json)).toList();
   }
 
-  static SupabaseClient get client => Supabase.instance.client;
+  Future<List<Transaction>> getTransactionsByDateRange(DateTime start, DateTime end) async {
+    final data = await _client
+        .from('transactions')
+        .select()
+        .gte('transaction_date', start.toIso8601String())
+        .lte('transaction_date', end.toIso8601String());
+    return (data as List).map((json) => Transaction.fromJson(json)).toList();
+  }
+
+  Future<void> addTransaction(Transaction transaction) async {
+    await _client.from('transactions').insert(transaction.toJson());
+  }
+
+  Future<List<Todo>> getTodos() async {
+    final data = await _client.from('todos').select();
+    return (data as List).map((json) => Todo.fromJson(json)).toList();
+  }
+
+  Future<List<Todo>> getTodosByDateRange(DateTime start, DateTime end) async {
+    final data = await _client
+        .from('todos')
+        .select()
+        .gte('created_at', start.toIso8601String())
+        .lte('created_at', end.toIso8601String());
+    return (data as List).map((json) => Todo.fromJson(json)).toList();
+  }
+
+  Future<void> addTodo(Todo todo) async {
+    await _client.from('todos').insert(todo.toJson());
+  }
+
+  Future<void> updateTodo(Todo todo) async {
+    await _client.from('todos').update(todo.toJson()).eq('id', todo.id);
+  }
+
+  Future<void> deleteTodo(String id) async {
+    await _client.from('todos').delete().eq('id', id);
+  }
 }

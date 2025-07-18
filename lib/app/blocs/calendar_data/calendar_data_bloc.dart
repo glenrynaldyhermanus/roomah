@@ -8,7 +8,9 @@ part 'calendar_data_event.dart';
 part 'calendar_data_state.dart';
 
 class CalendarDataBloc extends Bloc<CalendarDataEvent, CalendarDataState> {
-  CalendarDataBloc() : super(CalendarDataInitial()) {
+  final SupabaseService _supabaseService;
+
+  CalendarDataBloc(this._supabaseService) : super(CalendarDataInitial()) {
     on<FetchCalendarData>(_onFetchCalendarData);
   }
 
@@ -16,21 +18,8 @@ class CalendarDataBloc extends Bloc<CalendarDataEvent, CalendarDataState> {
       FetchCalendarData event, Emitter<CalendarDataState> emit) async {
     emit(CalendarDataLoading());
     try {
-      final todoResponse = await SupabaseService.client
-          .from('todos')
-          .select()
-          .gte('created_at', event.startDate.toIso8601String())
-          .lte('created_at', event.endDate.toIso8601String());
-
-      final transactionResponse = await SupabaseService.client
-          .from('transactions')
-          .select()
-          .gte('transaction_date', event.startDate.toIso8601String())
-          .lte('transaction_date', event.endDate.toIso8601String());
-
-      final todos = (todoResponse as List).map((json) => Todo.fromJson(json)).toList();
-      final transactions =
-          (transactionResponse as List).map((json) => Transaction.fromJson(json)).toList();
+      final todos = await _supabaseService.getTodosByDateRange(event.startDate, event.endDate);
+      final transactions = await _supabaseService.getTransactionsByDateRange(event.startDate, event.endDate);
 
       final events = [...todos, ...transactions];
       emit(CalendarDataLoaded(events));

@@ -1,22 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:myapp/app/blocs/todo/todo_bloc.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:myapp/app/models/todo_item.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
 
   @override
-  State<TodoScreen> createState() => _TodoScreenState();
+  _TodoScreenState createState() => _TodoScreenState();
 }
 
 class _TodoScreenState extends State<TodoScreen> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<TodoBloc>().add(FetchTodos());
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,70 +26,115 @@ class _TodoScreenState extends State<TodoScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is TodoLoaded) {
-            return ListView.builder(
-              itemCount: state.todos.length,
-              itemBuilder: (context, index) {
-                final todo = state.todos[index];
-                return ListTile(
-                  title: Text(todo.title),
-                  leading: Checkbox(
-                    value: todo.isCompleted,
-                    onChanged: (value) {
-                      // Handle update
+            return Column(
+              children: [
+                Expanded(
+                  child: ReorderableListView(
+                    onReorder: (oldIndex, newIndex) {
+                      context
+                          .read<TodoBloc>()
+                          .add(ReorderTodo(oldIndex, newIndex));
                     },
+                    children: state.todos
+                        .map((todo) => _buildTodoItem(context, todo))
+                        .toList(),
                   ),
-                );
-              },
+                ),
+                if (state.completedTodos.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Completed',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                Expanded(
+                  child: ListView(
+                    children:
+                        _buildCompletedGroups(context, state.completedTodos),
+                  ),
+                ),
+              ],
             );
           }
           if (state is TodoError) {
             return Center(child: Text(state.message));
           }
-          return Center(
-            child: NeumorphicIcon(
-              PhosphorIcons.checkSquare(),
-              size: 100,
-            ),
-          );
+          return const Center(child: Text('No Todos'));
         },
       ),
       floatingActionButton: NeumorphicFloatingActionButton(
         onPressed: () {
-          _showAddTodoDialog(context);
+          context.go('/todo/form');
         },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  void _showAddTodoDialog(BuildContext context) {
-    final TextEditingController controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add To-Do'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(hintText: 'Enter to-do title'),
+  Widget _buildTodoItem(BuildContext context, Todo todo) {
+    return ListTile(
+      key: ValueKey(todo.id),
+      leading: Checkbox(
+        value: todo.isCompleted,
+        onChanged: (value) {
+          final updatedTodo = todo.copyWith(
+            isCompleted: value,
+            completedAt: value! ? DateTime.now() : null,
+            clearCompletedAt: !value,
+          );
+          context.read<TodoBloc>().add(UpdateTodo(updatedTodo));
+        },
+      ),
+      title: Text(todo.title),
+      subtitle: todo.description != null ? Text(todo.description!) : null,
+      trailing: PopupMenuButton(
+        itemBuilder: (context) => [
+          const PopupMenuItem(
+            value: 'edit',
+            child: Text('Edit'),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                context.read<TodoBloc>().add(AddTodo(controller.text));
-                Navigator.of(context).pop();
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+          const PopupMenuItem(
+            value: 'delete',
+            child: Text('Delete'),
+          ),
+        ],
+        onSelected: (value) {
+          if (value == 'edit') {
+            context.go('/todo/form', extra: todo);
+          } else if (value == 'delete') {
+            context.read<TodoBloc>().add(DeleteTodo(todo));
+          }
+        },
+      ),
     );
+  }
+
+  List<Widget> _buildCompletedGroups(
+      BuildContext context, List<Todo> completedTodos) {
+    final groups = <String, List<Todo>>{};
+    for (final todo in completedTodos) {
+      final date = DateFormat.yMMMd().format(todo.completedAt!);
+      if (groups[date] == null) {
+        groups[date] = [];
+      }
+      groups[date]!.add(todo);
+    }
+
+    return groups.entries.map((entry) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              entry.key,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+          ...entry.value.map((todo) => _buildTodoItem(context, todo)),
+        ],
+      );
+    }).toList();
   }
 }
