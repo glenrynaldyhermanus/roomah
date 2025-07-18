@@ -1,41 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import 'package:myapp/app/screens/dashboard/dashboard_screen.dart';
-import 'package:myapp/app/screens/todo/todo_screen.dart';
-import 'package:myapp/app/screens/budget/budget_screen.dart';
-import 'package:myapp/app/screens/calendar/calendar_screen.dart';
+class MainScreen extends StatelessWidget {
+  final Widget child;
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({super.key, required this.child});
 
-  @override
-  _MainScreenState createState() => _MainScreenState();
-}
+  int _calculateSelectedIndex(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.toString();
+    if (location.startsWith('/dashboard')) {
+      return 0;
+    }
+    if (location.startsWith('/todo')) {
+      return 1;
+    }
+    if (location.startsWith('/finance')) {
+      return 2;
+    }
+    if (location.startsWith('/budget')) {
+      return 3;
+    }
+    if (location.startsWith('/calendar')) {
+      return 4;
+    }
+    return 0;
+  }
 
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _widgetOptions = <Widget>[
-    DashboardScreen(),
-    TodoScreen(),
-    BudgetScreen(),
-    CalendarScreen(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  void _onItemTapped(int index, BuildContext context) {
+    switch (index) {
+      case 0:
+        GoRouter.of(context).go('/dashboard');
+        break;
+      case 1:
+        GoRouter.of(context).go('/todo');
+        break;
+      case 2:
+        GoRouter.of(context).go('/finance');
+        break;
+      case 3:
+        GoRouter.of(context).go('/budget');
+        break;
+      case 4:
+        GoRouter.of(context).go('/calendar');
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: child,
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
@@ -47,6 +63,10 @@ class _MainScreenState extends State<MainScreen> {
             label: 'To-Do',
           ),
           BottomNavigationBarItem(
+            icon: Icon(PhosphorIcons.creditCard()),
+            label: 'Finance',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(PhosphorIcons.wallet()),
             label: 'Budget',
           ),
@@ -55,11 +75,11 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Calendar',
           ),
         ],
-        currentIndex: _selectedIndex,
+        currentIndex: _calculateSelectedIndex(context),
         selectedItemColor: Theme.of(context).colorScheme.secondary,
         unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Penting untuk lebih dari 3 item
+        onTap: (index) => _onItemTapped(index, context),
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }

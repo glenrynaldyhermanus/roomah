@@ -6,3 +6,14 @@ abstract class TodoEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class FetchTodos extends TodoEvent {}
+
+class AddTodo extends TodoEvent {
+  final String title;
+
+  const AddTodo(this.title);
+
+  @override
+  List<Object> get props => [title];
+}

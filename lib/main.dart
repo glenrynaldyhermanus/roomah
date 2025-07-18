@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:myapp/app/blocs/budget/budget_bloc.dart';
+import 'package:myapp/app/blocs/calendar_data/calendar_data_bloc.dart';
 import 'package:myapp/app/blocs/todo/todo_bloc.dart';
+import 'package:myapp/app/blocs/transaction/transaction_bloc.dart';
 import 'package:myapp/app/routes/app_router.dart';
 import 'package:myapp/app/themes/app_theme.dart';
+import 'package:myapp/app/services/supabase_service.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SupabaseService.initialize();
   runApp(const MyApp());
 }
 
@@ -19,6 +24,8 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => TodoBloc()),
         BlocProvider(create: (context) => BudgetBloc()),
+        BlocProvider(create: (context) => TransactionBloc()),
+        BlocProvider(create: (context) => CalendarDataBloc()),
       ],
       child: NeumorphicTheme(
         themeMode: ThemeMode.light,
