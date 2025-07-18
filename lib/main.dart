@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.themeData,
         child: Builder(
           builder: (context) => MaterialApp.router(
-            title: 'Household App',
+            title: 'Roomah',
             themeMode: ThemeMode.light,
             theme: ThemeData(
               colorScheme: ColorScheme.light(
