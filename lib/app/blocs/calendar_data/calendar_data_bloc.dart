@@ -19,9 +19,9 @@ class CalendarDataBloc extends Bloc<CalendarDataEvent, CalendarDataState> {
     emit(CalendarDataLoading());
     try {
       final todos = await _supabaseService.getTodosByDateRange(event.startDate, event.endDate);
-      final transactions = await _supabaseService.getTransactionsByDateRange(event.startDate, event.endDate);
+      final finances = await _supabaseService.getFinancesByDateRange(event.startDate, event.endDate);
 
-      final events = [...todos, ...transactions];
+              final events = [...todos, ...finances];
       emit(CalendarDataLoaded(events));
     } catch (e) {
       emit(CalendarDataError(e.toString()));

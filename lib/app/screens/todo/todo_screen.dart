@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:myapp/app/blocs/todo/todo_bloc.dart';
 import 'package:myapp/app/models/todo_item.dart';
+import 'package:myapp/app/widgets/custom_neumorphic_widgets.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
@@ -17,8 +17,12 @@ class _TodoScreenState extends State<TodoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: NeumorphicAppBar(
+      backgroundColor: const Color(0xFFE0E5EC),
+      appBar: AppBar(
         title: const Text('To-Do List'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
       ),
       body: BlocBuilder<TodoBloc, TodoState>(
         builder: (context, state) {
@@ -29,12 +33,7 @@ class _TodoScreenState extends State<TodoScreen> {
             return Column(
               children: [
                 Expanded(
-                  child: ReorderableListView(
-                    onReorder: (oldIndex, newIndex) {
-                      context
-                          .read<TodoBloc>()
-                          .add(ReorderTodo(oldIndex, newIndex));
-                    },
+                  child: ListView(
                     children: state.todos
                         .map((todo) => _buildTodoItem(context, todo))
                         .toList(),
@@ -63,49 +62,112 @@ class _TodoScreenState extends State<TodoScreen> {
           return const Center(child: Text('No Todos'));
         },
       ),
-      floatingActionButton: NeumorphicFloatingActionButton(
+      floatingActionButton: CustomNeumorphicButton(
         onPressed: () {
           context.go('/todo/form');
         },
-        child: const Icon(Icons.add),
+        depth: 12.0,
+        borderRadius: 28.0,
+        padding: const EdgeInsets.all(16.0),
+        child: const Icon(
+          Icons.add,
+          size: 28,
+          color: Colors.white,
+        ),
       ),
     );
   }
 
   Widget _buildTodoItem(BuildContext context, Todo todo) {
-    return ListTile(
-      key: ValueKey(todo.id),
-      leading: Checkbox(
-        value: todo.isCompleted,
-        onChanged: (value) {
-          final updatedTodo = todo.copyWith(
-            isCompleted: value,
-            completedAt: value! ? DateTime.now() : null,
-            clearCompletedAt: !value,
-          );
-          context.read<TodoBloc>().add(UpdateTodo(updatedTodo));
-        },
-      ),
-      title: Text(todo.title),
-      subtitle: todo.description != null ? Text(todo.description!) : null,
-      trailing: PopupMenuButton(
-        itemBuilder: (context) => [
-          const PopupMenuItem(
-            value: 'edit',
-            child: Text('Edit'),
-          ),
-          const PopupMenuItem(
-            value: 'delete',
-            child: Text('Delete'),
-          ),
-        ],
-        onSelected: (value) {
-          if (value == 'edit') {
-            context.go('/todo/form', extra: todo);
-          } else if (value == 'delete') {
-            context.read<TodoBloc>().add(DeleteTodo(todo));
-          }
-        },
+    return CustomNeumorphicCard(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            CustomNeumorphicButton(
+              onPressed: () {
+                final updatedTodo = todo.copyWith(
+                  isCompleted: !todo.isCompleted,
+                  completedAt: !todo.isCompleted ? DateTime.now() : null,
+                  clearCompletedAt: todo.isCompleted,
+                );
+                context.read<TodoBloc>().add(UpdateTodo(updatedTodo));
+              },
+              depth: 4.0,
+              borderRadius: 8.0,
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(
+                todo.isCompleted ? Icons.check : Icons.radio_button_unchecked,
+                size: 20,
+                color: todo.isCompleted ? Colors.green[600] : Colors.grey[600],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    todo.title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: todo.isCompleted ? Colors.grey[600] : Colors.black87,
+                      decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                  if (todo.description != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      todo.description!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            CustomNeumorphicButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.edit),
+                          title: const Text('Edit'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            context.go('/todo/form', extra: todo);
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.delete, color: Colors.red),
+                          title: const Text('Delete', style: TextStyle(color: Colors.red)),
+                          onTap: () {
+                            Navigator.pop(context);
+                            context.read<TodoBloc>().add(DeleteTodo(todo));
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              depth: 4.0,
+              borderRadius: 8.0,
+              padding: const EdgeInsets.all(8.0),
+              child: const Icon(Icons.more_vert, size: 20),
+            ),
+          ],
+        ),
       ),
     );
   }

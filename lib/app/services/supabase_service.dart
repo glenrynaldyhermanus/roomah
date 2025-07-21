@@ -1,26 +1,58 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:myapp/app/models/todo_item.dart';
-import 'package:myapp/app/models/transaction.dart';
+import 'package:myapp/app/models/finance.dart';
 
 class SupabaseService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  Future<List<Transaction>> getTransactions() async {
-    final data = await _client.from('transactions').select();
-    return (data as List).map((json) => Transaction.fromJson(json)).toList();
+  Future<List<Finance>> getFinances() async {
+    try {
+      final data = await _client
+          .from('finances')
+          .select()
+          .timeout(const Duration(seconds: 10));
+      return (data as List).map((json) => Finance.fromJson(json)).toList();
+    } catch (e) {
+      if (e.toString().contains('rrno = 7') || 
+          e.toString().contains('no address associated with hostname')) {
+        throw Exception('Network error: Unable to resolve hostname. Please check your internet connection.');
+      }
+      rethrow;
+    }
   }
 
-  Future<List<Transaction>> getTransactionsByDateRange(DateTime start, DateTime end) async {
-    final data = await _client
-        .from('transactions')
-        .select()
-        .gte('transaction_date', start.toIso8601String())
-        .lte('transaction_date', end.toIso8601String());
-    return (data as List).map((json) => Transaction.fromJson(json)).toList();
+  Future<List<Finance>> getFinancesByDateRange(DateTime start, DateTime end) async {
+    try {
+      final data = await _client
+          .from('finances')
+          .select()
+          .gte('start_date', start.toIso8601String())
+          .lte('end_date', end.toIso8601String())
+
+          .timeout(const Duration(seconds: 10));
+      return (data as List).map((json) => Finance.fromJson(json)).toList();
+    } catch (e) {
+      if (e.toString().contains('rrno = 7') || 
+          e.toString().contains('no address associated with hostname')) {
+        throw Exception('Network error: Unable to resolve hostname. Please check your internet connection.');
+      }
+      rethrow;
+    }
   }
 
-  Future<void> addTransaction(Transaction transaction) async {
-    await _client.from('transactions').insert(transaction.toJson());
+  Future<void> addFinance(Finance finance) async {
+    try {
+      await _client
+          .from('finances')
+          .insert(finance.toJson())
+          .timeout(const Duration(seconds: 10));
+    } catch (e) {
+      if (e.toString().contains('rrno = 7') || 
+          e.toString().contains('no address associated with hostname')) {
+        throw Exception('Network error: Unable to resolve hostname. Please check your internet connection.');
+      }
+      rethrow;
+    }
   }
 
   Future<List<Todo>> getTodos() async {

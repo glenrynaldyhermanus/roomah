@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:myapp/app/blocs/calendar_data/calendar_data_bloc.dart';
 import 'package:myapp/app/models/todo_item.dart';
-import 'package:myapp/app/models/transaction.dart';
+import 'package:myapp/app/models/finance.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -29,7 +29,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: NeumorphicAppBar(
+      appBar: AppBar(
         title: const Text('Calendar'),
       ),
       body: BlocBuilder<CalendarDataBloc, CalendarDataState>(
@@ -55,8 +55,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     return state.events.where((event) {
                       if (event is Todo) {
                         return isSameDay(event.createdAt, day);
-                      } else if (event is Transaction) {
-                        return isSameDay(event.transactionDate, day);
+                      } else if (event is Finance) {
+                        return isSameDay(event.startDate, day);
                       }
                       return false;
                     }).toList();
@@ -82,12 +82,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           title: Text('Todo: ${event.title}'),
                           subtitle: Text(event.createdAt.toString()),
                         );
-                      } else if (event is Transaction) {
+                      } else if (event is Finance) {
                         return ListTile(
-                          title: Text('Transaction: ${event.description}'),
+                          title: Text('Finance: ${event.name}'),
                           subtitle: Text(
-                              '${event.amount} - ${event.transactionDate}'),
-                          trailing: Text(event.type),
+                              '${event.amount} - ${event.startDate}'),
+                          trailing: Text('Budget'),
                         );
                       }
                       return Container();

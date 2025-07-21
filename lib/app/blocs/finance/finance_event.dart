@@ -7,13 +7,13 @@ abstract class FinanceEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchTransactions extends FinanceEvent {}
+class FetchFinances extends FinanceEvent {}
 
-class AddTransaction extends FinanceEvent {
-  final Transaction transaction;
+class AddFinance extends FinanceEvent {
+  final Finance finance;
 
-  const AddTransaction(this.transaction);
+  const AddFinance(this.finance);
 
   @override
-  List<Object> get props => [transaction];
+  List<Object> get props => [finance];
 }

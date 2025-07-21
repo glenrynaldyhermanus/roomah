@@ -12,12 +12,12 @@ class FinanceInitial extends FinanceState {}
 class FinanceLoading extends FinanceState {}
 
 class FinanceLoaded extends FinanceState {
-  final List<Transaction> transactions;
+  final List<Finance> finances;
 
-  const FinanceLoaded(this.transactions);
+  const FinanceLoaded(this.finances);
 
   @override
-  List<Object> get props => [transactions];
+  List<Object> get props => [finances];
 }
 
 class FinanceError extends FinanceState {

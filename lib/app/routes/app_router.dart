@@ -4,6 +4,7 @@ import 'package:myapp/app/models/todo_item.dart';
 import 'package:myapp/app/screens/calendar/calendar_screen.dart';
 import 'package:myapp/app/screens/dashboard/dashboard_screen.dart';
 import 'package:myapp/app/screens/finance/finance_screen.dart';
+import 'package:myapp/app/screens/finance/finance_form_screen.dart';
 import 'package:myapp/app/screens/main_screen.dart';
 import 'package:myapp/app/screens/todo/todo_form_screen.dart';
 import 'package:myapp/app/screens/todo/todo_screen.dart';
@@ -49,6 +50,14 @@ final router = GoRouter(
           builder: (context, state) {
             return const FinanceScreen();
           },
+          routes: [
+            GoRoute(
+              path: 'form',
+              builder: (context, state) {
+                return const FinanceFormScreen();
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/calendar',
