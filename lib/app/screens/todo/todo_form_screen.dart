@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/app/blocs/todo/todo_bloc.dart';
 import 'package:myapp/app/models/todo_item.dart';
-import 'package:myapp/app/widgets/custom_neumorphic_widgets.dart';
+import 'package:myapp/app/widgets/neumorphic_widgets.dart';
 
 class TodoFormScreen extends StatefulWidget {
   final Todo? todo;
@@ -22,7 +22,9 @@ class _TodoFormScreenState extends State<TodoFormScreen> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.todo?.title ?? '');
-    _descriptionController = TextEditingController(text: widget.todo?.description ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.todo?.description ?? '',
+    );
   }
 
   @override
@@ -48,7 +50,7 @@ class _TodoFormScreenState extends State<TodoFormScreen> {
           key: _formKey,
           child: Column(
             children: [
-              CustomNeumorphicTextField(
+              NeumorphicTextField(
                 controller: _titleController,
                 labelText: 'Title',
                 prefixIcon: const Icon(Icons.title),
@@ -60,13 +62,13 @@ class _TodoFormScreenState extends State<TodoFormScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              CustomNeumorphicTextField(
+              NeumorphicTextField(
                 controller: _descriptionController,
                 labelText: 'Description',
                 prefixIcon: const Icon(Icons.description),
               ),
               const SizedBox(height: 20),
-              CustomNeumorphicButton(
+              NeumorphicButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     final todo = Todo(
@@ -95,7 +97,7 @@ class _TodoFormScreenState extends State<TodoFormScreen> {
                     color: Colors.white,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

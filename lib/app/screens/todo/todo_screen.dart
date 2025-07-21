@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:myapp/app/blocs/todo/todo_bloc.dart';
 import 'package:myapp/app/models/todo_item.dart';
-import 'package:myapp/app/widgets/custom_neumorphic_widgets.dart';
+import 'package:myapp/app/widgets/neumorphic_widgets.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
@@ -34,9 +34,10 @@ class _TodoScreenState extends State<TodoScreen> {
               children: [
                 Expanded(
                   child: ListView(
-                    children: state.todos
-                        .map((todo) => _buildTodoItem(context, todo))
-                        .toList(),
+                    children:
+                        state.todos
+                            .map((todo) => _buildTodoItem(context, todo))
+                            .toList(),
                   ),
                 ),
                 if (state.completedTodos.isNotEmpty)
@@ -49,8 +50,10 @@ class _TodoScreenState extends State<TodoScreen> {
                   ),
                 Expanded(
                   child: ListView(
-                    children:
-                        _buildCompletedGroups(context, state.completedTodos),
+                    children: _buildCompletedGroups(
+                      context,
+                      state.completedTodos,
+                    ),
                   ),
                 ),
               ],
@@ -62,30 +65,26 @@ class _TodoScreenState extends State<TodoScreen> {
           return const Center(child: Text('No Todos'));
         },
       ),
-      floatingActionButton: CustomNeumorphicButton(
+      floatingActionButton: NeumorphicButton(
         onPressed: () {
           context.go('/todo/form');
         },
         depth: 12.0,
         borderRadius: 28.0,
         padding: const EdgeInsets.all(16.0),
-        child: const Icon(
-          Icons.add,
-          size: 28,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
     );
   }
 
   Widget _buildTodoItem(BuildContext context, Todo todo) {
-    return CustomNeumorphicCard(
+    return NeumorphicCard(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
-            CustomNeumorphicButton(
+            NeumorphicButton(
               onPressed: () {
                 final updatedTodo = todo.copyWith(
                   isCompleted: !todo.isCompleted,
@@ -113,8 +112,10 @@ class _TodoScreenState extends State<TodoScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: todo.isCompleted ? Colors.grey[600] : Colors.black87,
-                      decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
+                      color:
+                          todo.isCompleted ? Colors.grey[600] : Colors.black87,
+                      decoration:
+                          todo.isCompleted ? TextDecoration.lineThrough : null,
                     ),
                   ),
                   if (todo.description != null) ...[
@@ -124,41 +125,51 @@ class _TodoScreenState extends State<TodoScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
-                        decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
+                        decoration:
+                            todo.isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
                       ),
                     ),
                   ],
                 ],
               ),
             ),
-            CustomNeumorphicButton(
+            NeumorphicButton(
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
-                  builder: (context) => Container(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          leading: const Icon(Icons.edit),
-                          title: const Text('Edit'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            context.go('/todo/form', extra: todo);
-                          },
+                  builder:
+                      (context) => Container(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.edit),
+                              title: const Text('Edit'),
+                              onTap: () {
+                                Navigator.pop(context);
+                                context.go('/todo/form', extra: todo);
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              title: const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                              onTap: () {
+                                Navigator.pop(context);
+                                context.read<TodoBloc>().add(DeleteTodo(todo));
+                              },
+                            ),
+                          ],
                         ),
-                        ListTile(
-                          leading: const Icon(Icons.delete, color: Colors.red),
-                          title: const Text('Delete', style: TextStyle(color: Colors.red)),
-                          onTap: () {
-                            Navigator.pop(context);
-                            context.read<TodoBloc>().add(DeleteTodo(todo));
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                      ),
                 );
               },
               depth: 4.0,
@@ -173,7 +184,9 @@ class _TodoScreenState extends State<TodoScreen> {
   }
 
   List<Widget> _buildCompletedGroups(
-      BuildContext context, List<Todo> completedTodos) {
+    BuildContext context,
+    List<Todo> completedTodos,
+  ) {
     final groups = <String, List<Todo>>{};
     for (final todo in completedTodos) {
       final date = DateFormat.yMMMd().format(todo.completedAt!);

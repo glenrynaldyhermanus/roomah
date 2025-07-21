@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/app/blocs/finance/finance_bloc.dart';
-import 'package:myapp/app/widgets/custom_neumorphic_widgets.dart';
+import 'package:myapp/app/widgets/neumorphic_widgets.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class FinanceScreen extends StatefulWidget {
@@ -35,17 +35,14 @@ class _FinanceScreenState extends State<FinanceScreen>
     super.dispose();
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE0E5EC),
       appBar: AppBar(
         title: const Text(
           'Finance',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -55,7 +52,7 @@ class _FinanceScreenState extends State<FinanceScreen>
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: CustomNeumorphicToggle(
+            child: NeumorphicToggle(
               selectedIndex: _tabController.index,
               onChanged: (int index) {
                 _tabController.animateTo(index);
@@ -68,26 +65,19 @@ class _FinanceScreenState extends State<FinanceScreen>
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
-                _buildFinancesView(),
-                _buildBudgetView(),
-              ],
+              children: [_buildFinancesView(), _buildBudgetView()],
             ),
           ),
         ],
       ),
-      floatingActionButton: CustomNeumorphicButton(
+      floatingActionButton: NeumorphicButton(
         onPressed: () {
           context.push('/finance/form');
         },
         depth: 12.0,
         borderRadius: 28.0,
         padding: const EdgeInsets.all(16.0),
-        child: const Icon(
-          Icons.add,
-          size: 28,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
     );
   }
@@ -108,7 +98,7 @@ class _FinanceScreenState extends State<FinanceScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CustomNeumorphicContainer(
+                  NeumorphicContainer(
                     depth: 8.0,
                     borderRadius: 50.0,
                     padding: const EdgeInsets.all(24.0),
@@ -130,9 +120,7 @@ class _FinanceScreenState extends State<FinanceScreen>
                   const SizedBox(height: 8),
                   Text(
                     'Add your first finance item to get started',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                    ),
+                    style: TextStyle(color: Colors.grey[500]),
                   ),
                 ],
               ),
@@ -143,7 +131,7 @@ class _FinanceScreenState extends State<FinanceScreen>
             itemCount: state.finances.length,
             itemBuilder: (context, index) {
               final finance = state.finances[index];
-              return CustomNeumorphicCard(
+              return NeumorphicCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -227,7 +215,7 @@ class _FinanceScreenState extends State<FinanceScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CustomNeumorphicContainer(
+                NeumorphicContainer(
                   depth: 8.0,
                   borderRadius: 50.0,
                   padding: const EdgeInsets.all(24.0),
@@ -250,13 +238,10 @@ class _FinanceScreenState extends State<FinanceScreen>
                 Text(
                   'Please check your internet connection and try again.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 16),
                 ),
                 const SizedBox(height: 24),
-                CustomNeumorphicButton(
+                NeumorphicButton(
                   onPressed: () {
                     context.read<FinanceBloc>().add(FetchFinances());
                   },
@@ -266,10 +251,7 @@ class _FinanceScreenState extends State<FinanceScreen>
                   ),
                   child: const Text(
                     'Retry',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                   ),
                 ),
               ],
@@ -277,7 +259,7 @@ class _FinanceScreenState extends State<FinanceScreen>
           );
         }
         return Center(
-          child: CustomNeumorphicContainer(
+          child: NeumorphicContainer(
             depth: 8.0,
             borderRadius: 50.0,
             padding: const EdgeInsets.all(24.0),
@@ -297,7 +279,7 @@ class _FinanceScreenState extends State<FinanceScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CustomNeumorphicContainer(
+          NeumorphicContainer(
             depth: 8.0,
             borderRadius: 50.0,
             padding: const EdgeInsets.all(24.0),
@@ -319,10 +301,7 @@ class _FinanceScreenState extends State<FinanceScreen>
           const SizedBox(height: 12),
           Text(
             'Coming soon...',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
           ),
         ],
       ),

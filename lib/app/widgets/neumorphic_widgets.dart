@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomNeumorphicContainer extends StatelessWidget {
+class NeumorphicContainer extends StatelessWidget {
   final Widget child;
   final double depth;
   final double borderRadius;
@@ -9,7 +9,7 @@ class CustomNeumorphicContainer extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final bool isPressed;
 
-  const CustomNeumorphicContainer({
+  const NeumorphicContainer({
     super.key,
     required this.child,
     this.depth = 8.0,
@@ -34,13 +34,13 @@ class CustomNeumorphicContainer extends StatelessWidget {
         boxShadow: isPressed
             ? [
                 BoxShadow(
-                  color: darkColor.withOpacity(0.5),
+                  color: darkColor.withAlpha((255 * 0.5).round()),
                   offset: const Offset(3, 3),
                   blurRadius: 6,
                   spreadRadius: 0,
                 ),
                 BoxShadow(
-                  color: lightColor.withOpacity(0.5),
+                  color: lightColor.withAlpha((255 * 0.5).round()),
                   offset: const Offset(-3, -3),
                   blurRadius: 6,
                   spreadRadius: 0,
@@ -48,13 +48,13 @@ class CustomNeumorphicContainer extends StatelessWidget {
               ]
             : [
                 BoxShadow(
-                  color: darkColor.withOpacity(0.6),
+                  color: darkColor.withAlpha((255 * 0.6).round()),
                   offset: Offset(depth, depth),
                   blurRadius: depth * 1.5,
                   spreadRadius: 0,
                 ),
                 BoxShadow(
-                  color: lightColor.withOpacity(0.6),
+                  color: lightColor.withAlpha((255 * 0.6).round()),
                   offset: Offset(-depth, -depth),
                   blurRadius: depth * 1.5,
                   spreadRadius: 0,
@@ -88,7 +88,7 @@ class CustomNeumorphicContainer extends StatelessWidget {
   }
 }
 
-class CustomNeumorphicButton extends StatefulWidget {
+class NeumorphicButton extends StatefulWidget {
   final Widget child;
   final VoidCallback? onPressed;
   final double depth;
@@ -97,7 +97,7 @@ class CustomNeumorphicButton extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
 
-  const CustomNeumorphicButton({
+  const NeumorphicButton({
     super.key,
     required this.child,
     this.onPressed,
@@ -109,10 +109,10 @@ class CustomNeumorphicButton extends StatefulWidget {
   });
 
   @override
-  State<CustomNeumorphicButton> createState() => _CustomNeumorphicButtonState();
+  State<NeumorphicButton> createState() => _NeumorphicButtonState();
 }
 
-class _CustomNeumorphicButtonState extends State<CustomNeumorphicButton>
+class _NeumorphicButtonState extends State<NeumorphicButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -174,28 +174,25 @@ class _CustomNeumorphicButtonState extends State<CustomNeumorphicButton>
       onTapUp: widget.onPressed != null ? _onTapUp : null,
       onTapCancel: widget.onPressed != null ? _onTapCancel : null,
       onTap: _onTap,
-      child: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: CustomNeumorphicContainer(
-              depth: widget.depth,
-              borderRadius: widget.borderRadius,
-              backgroundColor: widget.backgroundColor,
-              padding: widget.padding,
-              margin: widget.margin,
-              isPressed: _isPressed,
-              child: widget.child,
-            ),
-          );
-        },
+      child: AnimatedScale(
+        scale: _isPressed ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+        child: NeumorphicContainer(
+          depth: widget.depth,
+          borderRadius: widget.borderRadius,
+          backgroundColor: widget.backgroundColor,
+          padding: widget.padding,
+          margin: widget.margin,
+          isPressed: _isPressed,
+          child: widget.child,
+        ),
       ),
     );
   }
 }
 
-class CustomNeumorphicTextField extends StatelessWidget {
+class NeumorphicTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String? labelText;
   final String? hintText;
@@ -208,7 +205,7 @@ class CustomNeumorphicTextField extends StatelessWidget {
   final int? maxLines;
   final bool enabled;
 
-  const CustomNeumorphicTextField({
+  const NeumorphicTextField({
     super.key,
     this.controller,
     this.labelText,
@@ -225,50 +222,96 @@ class CustomNeumorphicTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomNeumorphicContainer(
-      depth: 6.0,
-      borderRadius: 16.0,
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      isPressed: true, // Debossed effect
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        validator: validator,
-        onChanged: onChanged,
-        maxLines: maxLines,
-        enabled: enabled,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          labelText: labelText,
-          hintText: hintText,
-          prefixIcon: prefixIcon,
-          suffixIcon: suffixIcon,
-          labelStyle: TextStyle(
-            color: enabled ? Colors.grey[700] : Colors.grey[400],
-            fontWeight: FontWeight.w500,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Stack(
+        children: [
+          // Outer shadow (atas-kiri)
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withAlpha((255 * 0.8).round()),
+                    offset: const Offset(-4, -4),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+            ),
           ),
-          hintStyle: TextStyle(
-            color: Colors.grey[500],
+          // Outer shadow (bawah-kanan)
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withAlpha((255 * 0.18).round()),
+                    offset: const Offset(6, 6),
+                    blurRadius: 16,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        style: TextStyle(
-          color: enabled ? Colors.black87 : Colors.grey[600],
-          fontSize: 16,
-        ),
+          // Field utama dengan inner shadow
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF7F8FC),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: TextFormField(
+              controller: controller,
+              obscureText: obscureText,
+              keyboardType: keyboardType,
+              validator: validator,
+              onChanged: onChanged,
+              maxLines: maxLines,
+              enabled: enabled,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 16,
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: hintText ?? labelText,
+                hintStyle: TextStyle(
+                  color: Colors.grey[350],
+                  fontWeight: FontWeight.w300,
+                  fontSize: 16,
+                ),
+                prefixIcon: prefixIcon != null
+                    ? IconTheme(
+                        data: IconThemeData(
+                          color: Colors.grey[350],
+                          size: 22,
+                        ),
+                        child: prefixIcon!,
+                      )
+                    : null,
+                suffixIcon: suffixIcon,
+                contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class CustomNeumorphicToggle extends StatefulWidget {
+class NeumorphicToggle extends StatefulWidget {
   final int selectedIndex;
   final Function(int) onChanged;
   final List<String> options;
   final double height;
   final double borderRadius;
 
-  const CustomNeumorphicToggle({
+  const NeumorphicToggle({
     super.key,
     required this.selectedIndex,
     required this.onChanged,
@@ -278,10 +321,10 @@ class CustomNeumorphicToggle extends StatefulWidget {
   });
 
   @override
-  State<CustomNeumorphicToggle> createState() => _CustomNeumorphicToggleState();
+  State<NeumorphicToggle> createState() => _NeumorphicToggleState();
 }
 
-class _CustomNeumorphicToggleState extends State<CustomNeumorphicToggle>
+class _NeumorphicToggleState extends State<NeumorphicToggle>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _slideAnimation;
@@ -304,7 +347,7 @@ class _CustomNeumorphicToggleState extends State<CustomNeumorphicToggle>
   }
 
   @override
-  void didUpdateWidget(CustomNeumorphicToggle oldWidget) {
+  void didUpdateWidget(NeumorphicToggle oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedIndex != widget.selectedIndex) {
       _updateAnimation();
@@ -333,7 +376,7 @@ class _CustomNeumorphicToggleState extends State<CustomNeumorphicToggle>
         return Expanded(
           child: GestureDetector(
             onTap: () => widget.onChanged(index),
-            child: CustomNeumorphicContainer(
+            child: NeumorphicContainer(
               isPressed: isActive,
               depth: 8.0,
               borderRadius: widget.borderRadius,
@@ -360,7 +403,7 @@ class _CustomNeumorphicToggleState extends State<CustomNeumorphicToggle>
   }
 }
 
-class CustomNeumorphicCard extends StatelessWidget {
+class NeumorphicCard extends StatelessWidget {
   final Widget child;
   final double depth;
   final double borderRadius;
@@ -368,7 +411,7 @@ class CustomNeumorphicCard extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final Color? backgroundColor;
 
-  const CustomNeumorphicCard({
+  const NeumorphicCard({
     super.key,
     required this.child,
     this.depth = 6.0,
@@ -380,7 +423,7 @@ class CustomNeumorphicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomNeumorphicContainer(
+    return NeumorphicContainer(
       depth: depth,
       borderRadius: borderRadius,
       backgroundColor: backgroundColor,

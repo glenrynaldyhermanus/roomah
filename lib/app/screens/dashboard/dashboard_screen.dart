@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/app/widgets/custom_neumorphic_widgets.dart';
+import 'package:myapp/app/screens/ui_demo/ui_demo_screen.dart';
+import 'package:myapp/app/widgets/neumorphic_widgets.dart'; // Added import for UiDemoScreen
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -20,7 +21,7 @@ class DashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Welcome Section
-            CustomNeumorphicCard(
+            NeumorphicCard(
               margin: const EdgeInsets.only(bottom: 20.0),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -29,11 +30,7 @@ class DashboardScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.home,
-                          size: 32,
-                          color: Colors.blue[600],
-                        ),
+                        Icon(Icons.home, size: 32, color: Colors.blue[600]),
                         const SizedBox(width: 12),
                         const Expanded(
                           child: Text(
@@ -49,10 +46,7 @@ class DashboardScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       'Kelola rumah tangga Anda dengan mudah',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -62,10 +56,7 @@ class DashboardScreen extends StatelessWidget {
             // Quick Stats
             const Text(
               'Ringkasan Hari Ini',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Row(
@@ -117,14 +108,11 @@ class DashboardScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 24),
-            
+
             // Recent Activities
             const Text(
               'Aktivitas Terbaru',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             _buildActivityCard(
@@ -156,10 +144,7 @@ class DashboardScreen extends StatelessWidget {
             // Quick Actions
             const Text(
               'Aksi Cepat',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Row(
@@ -211,6 +196,19 @@ class DashboardScreen extends StatelessWidget {
                     },
                   ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildQuickActionCard(
+                    'UI Demo',
+                    Icons.widgets,
+                    Colors.teal,
+                    () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const UiDemoScreen()),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ],
@@ -219,8 +217,14 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String title, String value, String subtitle, IconData icon, Color color) {
-    return CustomNeumorphicCard(
+  Widget _buildStatCard(
+    String title,
+    String value,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
+    return NeumorphicCard(
       margin: const EdgeInsets.only(bottom: 8.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -253,10 +257,7 @@ class DashboardScreen extends StatelessWidget {
             ),
             Text(
               subtitle,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -264,8 +265,14 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActivityCard(String title, String amount, String time, IconData icon, Color color) {
-    return CustomNeumorphicCard(
+  Widget _buildActivityCard(
+    String title,
+    String amount,
+    String time,
+    IconData icon,
+    Color color,
+  ) {
+    return NeumorphicCard(
       margin: const EdgeInsets.only(bottom: 8.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -303,21 +310,20 @@ class DashboardScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Text(
-              time,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[500],
-              ),
-            ),
+            Text(time, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildQuickActionCard(String title, IconData icon, Color color, VoidCallback onTap) {
-    return CustomNeumorphicButton(
+  Widget _buildQuickActionCard(
+    String title,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return NeumorphicButton(
       onPressed: onTap,
       depth: 8.0,
       borderRadius: 12.0,
@@ -328,10 +334,7 @@ class DashboardScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             textAlign: TextAlign.center,
           ),
         ],
