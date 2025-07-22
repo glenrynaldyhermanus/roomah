@@ -1,9 +1,22 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
+import 'package:go_router/go_router.dart';
+import 'package:myapp/app/blocs/routines/routines_bloc.dart';
+import 'package:myapp/app/blocs/routines/routines_event.dart';
+import 'package:myapp/app/blocs/routines/routines_state.dart';
+import 'package:myapp/app/models/routine.dart';
 import 'package:myapp/app/screens/ui_demo/ui_demo_screen.dart';
-import 'package:myapp/app/widgets/neumorphic_widgets.dart'; // Added import for UiDemoScreen
+import 'package:myapp/app/widgets/neuma_widgets.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _selectedViewIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -21,38 +34,46 @@ class DashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Welcome Section
-            NeumorphicCard(
-              margin: const EdgeInsets.only(bottom: 20.0),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.home, size: 32, color: Colors.blue[600]),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Text(
-                            'Selamat Datang di Rumah Anda!',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
+            NeumaCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.home, size: 32, color: Colors.blue[600]),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Selamat Datang di Rumah Anda!',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Kelola rumah tangga Anda dengan mudah',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Kelola rumah tangga Anda dengan mudah',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  ),
+                ],
               ),
             ),
 
+            // View Toggle
+            NeumaToggle(
+              selectedIndex: _selectedViewIndex,
+              options: const ['Ringkasan', 'Aktivitas', 'Laporan'],
+              onChanged: (index) => setState(() => _selectedViewIndex = index),
+              height: 45,
+              activeColor: Colors.purple[600],
+              activeTextColor: Colors.white,
+              inactiveTextColor: Colors.grey[700],
+            ),
+            const SizedBox(height: 16),
+            
             // Quick Stats
             const Text(
               'Ringkasan Hari Ini',
@@ -97,14 +118,55 @@ class DashboardScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildStatCard(
-                    'Pengeluaran',
-                    'Rp 850K',
-                    'bulan ini',
-                    Icons.shopping_cart,
-                    Colors.red,
+                    'Routines',
+                    '2',
+                    'due hari ini',
+                    Icons.repeat,
+                    Colors.purple,
                   ),
                 ),
               ],
+            ),
+
+            const SizedBox(height: 24),
+
+            // Routines Section
+            const Text(
+              'Routines Hari Ini',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            BlocBuilder<RoutinesBloc, RoutinesState>(
+              builder: (context, state) {
+                if (state is RoutinesLoaded) {
+                  final todayRoutines = state.routines.where((routine) {
+                    final today = DateTime.now();
+                    return routine.isActive && 
+                           routine.nextDueDate.day == today.day &&
+                           routine.nextDueDate.month == today.month &&
+                           routine.nextDueDate.year == today.year;
+                  }).toList();
+                  
+                  if (todayRoutines.isEmpty) {
+                    return NeumaCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Tidak ada routines yang jatuh tempo hari ini',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ),
+                    );
+                  }
+                  
+                  return Column(
+                    children: todayRoutines.take(3).map((routine) => 
+                      _buildRoutineCard(context, routine)
+                    ).toList(),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
 
             const SizedBox(height: 24),
@@ -155,7 +217,7 @@ class DashboardScreen extends StatelessWidget {
                     Icons.add_task,
                     Colors.green,
                     () {
-                      // Navigate to todo form
+                      context.go('/todo/form');
                     },
                   ),
                 ),
@@ -166,7 +228,7 @@ class DashboardScreen extends StatelessWidget {
                     Icons.add_chart,
                     Colors.blue,
                     () {
-                      // Navigate to finance form
+                      context.go('/finance/form');
                     },
                   ),
                 ),
@@ -177,15 +239,30 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildQuickActionCard(
-                    'Jadwal Acara',
-                    Icons.event,
-                    Colors.orange,
+                    'Tambah Routine',
+                    Icons.repeat,
+                    Colors.purple,
                     () {
-                      // Navigate to calendar
+                      context.go('/routines/form');
                     },
                   ),
                 ),
                 const SizedBox(width: 12),
+                Expanded(
+                  child: _buildQuickActionCard(
+                    'Jadwal Acara',
+                    Icons.event,
+                    Colors.orange,
+                    () {
+                      context.go('/calendar');
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
                 Expanded(
                   child: _buildQuickActionCard(
                     'Laporan Bulanan',
@@ -217,6 +294,50 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildRoutineCard(BuildContext context, Routine routine) {
+    return NeumaCard(
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            Icon(Icons.repeat, color: Colors.purple[600], size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    routine.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (routine.description != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      routine.description!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            NeumaButton(
+              onPressed: () {
+                context.read<RoutinesBloc>().add(CompleteRoutine(routine.id));
+              },
+              child: const Icon(Icons.check, color: Colors.white, size: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatCard(
     String title,
     String value,
@@ -224,43 +345,39 @@ class DashboardScreen extends StatelessWidget {
     IconData icon,
     Color color,
   ) {
-    return NeumorphicCard(
-      margin: const EdgeInsets.only(bottom: 8.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: color, size: 24),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
+    return NeumaCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 24),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: color,
               ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
-            Text(
-              subtitle,
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-            ),
-          ],
-        ),
+          ),
+          Text(
+            subtitle,
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          ),
+        ],
       ),
     );
   }
@@ -272,47 +389,43 @@ class DashboardScreen extends StatelessWidget {
     IconData icon,
     Color color,
   ) {
-    return NeumorphicCard(
-      margin: const EdgeInsets.only(bottom: 8.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Icon(icon, color: color, size: 20),
+    return NeumaCard(
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8.0),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    amount,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: color,
-                      fontWeight: FontWeight.w500,
-                    ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  amount,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: color,
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Text(time, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-          ],
-        ),
+          ),
+          Text(time, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+        ],
       ),
     );
   }
@@ -323,11 +436,8 @@ class DashboardScreen extends StatelessWidget {
     Color color,
     VoidCallback onTap,
   ) {
-    return NeumorphicButton(
+    return NeumaButton(
       onPressed: onTap,
-      depth: 8.0,
-      borderRadius: 12.0,
-      padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           Icon(icon, color: color, size: 32),

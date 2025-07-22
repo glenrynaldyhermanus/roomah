@@ -18,8 +18,11 @@ class MainScreen extends StatelessWidget {
     if (location.startsWith('/finance')) {
       return 2;
     }
-    if (location.startsWith('/calendar')) {
+    if (location.startsWith('/routines')) {
       return 3;
+    }
+    if (location.startsWith('/calendar')) {
+      return 4;
     }
     return 0;
   }
@@ -36,6 +39,9 @@ class MainScreen extends StatelessWidget {
         GoRouter.of(context).go('/finance');
         break;
       case 3:
+        GoRouter.of(context).go('/routines');
+        break;
+      case 4:
         GoRouter.of(context).go('/calendar');
         break;
     }
@@ -58,6 +64,10 @@ class MainScreen extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(PhosphorIcons.creditCard()),
             label: 'Finance',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(PhosphorIcons.repeat()),
+            label: 'Routines',
           ),
           BottomNavigationBarItem(
             icon: Icon(PhosphorIcons.calendar()),

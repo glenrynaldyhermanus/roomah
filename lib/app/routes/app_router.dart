@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/app/models/todo_item.dart';
+import 'package:myapp/app/models/routine.dart';
 import 'package:myapp/app/screens/calendar/calendar_screen.dart';
 import 'package:myapp/app/screens/dashboard/dashboard_screen.dart';
 import 'package:myapp/app/screens/finance/finance_screen.dart';
@@ -8,6 +9,8 @@ import 'package:myapp/app/screens/finance/finance_form_screen.dart';
 import 'package:myapp/app/screens/main_screen.dart';
 import 'package:myapp/app/screens/todo/todo_form_screen.dart';
 import 'package:myapp/app/screens/todo/todo_screen.dart';
+import 'package:myapp/app/screens/routines/routines_screen.dart';
+import 'package:myapp/app/screens/routines/routines_form_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -55,6 +58,21 @@ final router = GoRouter(
               path: 'form',
               builder: (context, state) {
                 return const FinanceFormScreen();
+              },
+            ),
+          ],
+        ),
+        GoRoute(
+          path: '/routines',
+          builder: (context, state) {
+            return const RoutinesScreen();
+          },
+          routes: [
+            GoRoute(
+              path: 'form',
+              builder: (context, state) {
+                final routine = state.extra as Routine?;
+                return RoutinesFormScreen(routine: routine);
               },
             ),
           ],

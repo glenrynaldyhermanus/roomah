@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/app/blocs/finance/finance_bloc.dart';
 import 'package:myapp/app/models/finance.dart';
-import 'package:myapp/app/widgets/neumorphic_widgets.dart';
+import 'package:myapp/app/widgets/neuma_widgets.dart';
 
 class FinanceFormScreen extends StatefulWidget {
   const FinanceFormScreen({super.key});
@@ -40,13 +40,11 @@ class _FinanceFormScreenState extends State<FinanceFormScreen> {
         centerTitle: true,
         leading: NeumorphicButton(
           onPressed: () => context.pop(),
-          depth: 6.0,
-          borderRadius: 12.0,
           padding: const EdgeInsets.all(8.0),
           child: const Icon(Icons.arrow_back),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -54,31 +52,28 @@ class _FinanceFormScreenState extends State<FinanceFormScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Name Field
-              NeumorphicTextField(
+              NeumaTextField.compact(
                 controller: _nameController,
-                labelText: 'Finance Name',
-                prefixIcon: const Icon(Icons.account_balance_wallet),
+                hintText: 'Nama',
+                icon: Icons.edit,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a finance name';
+                    return 'Nama wajib diisi';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Amount Field
-              NeumorphicTextField(
+              NeumaTextField.compact(
                 controller: _amountController,
-                labelText: 'Amount',
-                prefixIcon: const Icon(Icons.attach_money),
+                hintText: 'Jumlah',
+                icon: Icons.attach_money,
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
+                    return 'Jumlah wajib diisi';
                   }
                   return null;
                 },
@@ -86,12 +81,12 @@ class _FinanceFormScreenState extends State<FinanceFormScreen> {
               const SizedBox(height: 20),
 
               // Start Date Picker
-              NeumorphicContainer(
-                depth: 4.0,
-                borderRadius: 16.0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
+              Neumorphic(
+                style: NeumorphicStyle(
+                  depth: 4,
+                  boxShape: NeumorphicBoxShape.roundRect(
+                    BorderRadius.all(Radius.circular(16)),
+                  ),
                 ),
                 child: InkWell(
                   onTap: () async {
@@ -122,12 +117,12 @@ class _FinanceFormScreenState extends State<FinanceFormScreen> {
               const SizedBox(height: 16),
 
               // End Date Picker
-              NeumorphicContainer(
-                depth: 4.0,
-                borderRadius: 16.0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
+              Neumorphic(
+                style: NeumorphicStyle(
+                  depth: 4,
+                  boxShape: NeumorphicBoxShape.roundRect(
+                    BorderRadius.all(Radius.circular(16)),
+                  ),
                 ),
                 child: InkWell(
                   onTap: () async {
@@ -158,20 +153,8 @@ class _FinanceFormScreenState extends State<FinanceFormScreen> {
               const SizedBox(height: 32),
 
               // Submit Button
-              NeumorphicButton(
-                onPressed: _submitForm,
-                depth: 10.0,
-                borderRadius: 16.0,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: const Text(
-                  'Save Finance',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              NeumaButton(onPressed: _submitForm, child: Text('Save')),
+              const SizedBox(height: 40), // Extra padding for keyboard
             ],
           ),
         ),

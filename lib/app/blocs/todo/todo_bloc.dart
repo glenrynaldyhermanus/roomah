@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:myapp/app/models/todo_item.dart';
 import 'package:myapp/app/services/supabase_service.dart';

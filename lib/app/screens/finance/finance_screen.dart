@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/app/blocs/finance/finance_bloc.dart';
-import 'package:myapp/app/widgets/neumorphic_widgets.dart';
+import 'package:myapp/app/widgets/neuma_widgets.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class FinanceScreen extends StatefulWidget {
@@ -37,47 +37,40 @@ class _FinanceScreenState extends State<FinanceScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE0E5EC),
-      appBar: AppBar(
-        title: const Text(
-          'Finance',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+    return NeumorphicBackground(
+      child: Scaffold(
+        backgroundColor: NeumorphicTheme.baseColor(context),
+        appBar: NeumorphicAppBar(title: const Text('Finance')),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: NeumaToggle(
+                selectedIndex: _tabController.index,
+                options: const ['Finances', 'Budget'],
+                onChanged: (int index) {
+                  _tabController.animateTo(index);
+                },
+                height: 50,
+                activeColor: Colors.blue[600],
+                activeTextColor: Colors.white,
+                inactiveTextColor: Colors.grey[700],
+              ),
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [_buildFinancesView(), _buildBudgetView()],
+              ),
+            ),
+          ],
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: NeumorphicToggle(
-              selectedIndex: _tabController.index,
-              onChanged: (int index) {
-                _tabController.animateTo(index);
-              },
-              options: const ['Finances', 'Budget'],
-              height: 50,
-              borderRadius: 16,
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [_buildFinancesView(), _buildBudgetView()],
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: NeumorphicButton(
-        onPressed: () {
-          context.push('/finance/form');
-        },
-        depth: 12.0,
-        borderRadius: 28.0,
-        padding: const EdgeInsets.all(16.0),
-        child: const Icon(Icons.add, size: 28, color: Colors.white),
+        floatingActionButton: NeumaButton(
+          onPressed: () {
+            context.push('/finance/form');
+          },
+          child: const Icon(Icons.add, size: 28, color: Colors.white),
+        ),
       ),
     );
   }
@@ -98,9 +91,11 @@ class _FinanceScreenState extends State<FinanceScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  NeumorphicContainer(
-                    depth: 8.0,
-                    borderRadius: 50.0,
+                  Neumorphic(
+                    style: const NeumorphicStyle(
+                      depth: 8,
+                      boxShape: NeumorphicBoxShape.circle(),
+                    ),
                     padding: const EdgeInsets.all(24.0),
                     child: Icon(
                       PhosphorIcons.creditCard(),
@@ -131,7 +126,7 @@ class _FinanceScreenState extends State<FinanceScreen>
             itemCount: state.finances.length,
             itemBuilder: (context, index) {
               final finance = state.finances[index];
-              return NeumorphicCard(
+              return NeumaCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -147,14 +142,17 @@ class _FinanceScreenState extends State<FinanceScreen>
                             ),
                           ),
                         ),
-                        Container(
+                        Neumorphic(
+                          style: NeumorphicStyle(
+                            color: Colors.blue.withAlpha(30),
+                            boxShape: NeumorphicBoxShape.roundRect(
+                              BorderRadius.circular(12),
+                            ),
+                            depth: 2,
+                          ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12.0,
                             vertical: 6.0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12.0),
                           ),
                           child: Text(
                             'Budget',
@@ -177,7 +175,7 @@ class _FinanceScreenState extends State<FinanceScreen>
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '${finance.amount.toStringAsFixed(2)}',
+                          finance.amount.toStringAsFixed(2),
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -215,9 +213,11 @@ class _FinanceScreenState extends State<FinanceScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                NeumorphicContainer(
-                  depth: 8.0,
-                  borderRadius: 50.0,
+                Neumorphic(
+                  style: const NeumorphicStyle(
+                    depth: 8,
+                    boxShape: NeumorphicBoxShape.circle(),
+                  ),
                   padding: const EdgeInsets.all(24.0),
                   child: Icon(
                     PhosphorIcons.warning(),
@@ -241,17 +241,22 @@ class _FinanceScreenState extends State<FinanceScreen>
                   style: TextStyle(color: Colors.grey[600], fontSize: 16),
                 ),
                 const SizedBox(height: 24),
-                NeumorphicButton(
+                NeumaButton(
                   onPressed: () {
                     context.read<FinanceBloc>().add(FetchFinances());
                   },
+
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24.0,
                     vertical: 12.0,
                   ),
                   child: const Text(
                     'Retry',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],
@@ -259,9 +264,11 @@ class _FinanceScreenState extends State<FinanceScreen>
           );
         }
         return Center(
-          child: NeumorphicContainer(
-            depth: 8.0,
-            borderRadius: 50.0,
+          child: Neumorphic(
+            style: const NeumorphicStyle(
+              depth: 8,
+              boxShape: NeumorphicBoxShape.circle(),
+            ),
             padding: const EdgeInsets.all(24.0),
             child: Icon(
               PhosphorIcons.creditCard(),
@@ -279,9 +286,11 @@ class _FinanceScreenState extends State<FinanceScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          NeumorphicContainer(
-            depth: 8.0,
-            borderRadius: 50.0,
+          Neumorphic(
+            style: const NeumorphicStyle(
+              depth: 8,
+              boxShape: NeumorphicBoxShape.circle(),
+            ),
             padding: const EdgeInsets.all(24.0),
             child: Icon(
               PhosphorIcons.wallet(),
