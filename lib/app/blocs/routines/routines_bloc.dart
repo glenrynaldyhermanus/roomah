@@ -12,6 +12,8 @@ class RoutinesBloc extends Bloc<RoutinesEvent, RoutinesState> {
     on<UpdateRoutine>(_onUpdateRoutine);
     on<DeleteRoutine>(_onDeleteRoutine);
     on<CompleteRoutine>(_onCompleteRoutine);
+    // Daftarkan handler untuk SnoozeRoutine
+    on<SnoozeRoutine>(_onSnoozeRoutine);
     on<ToggleRoutineActive>(_onToggleRoutineActive);
   }
 
@@ -55,6 +57,16 @@ class RoutinesBloc extends Bloc<RoutinesEvent, RoutinesState> {
   Future<void> _onCompleteRoutine(CompleteRoutine event, Emitter<RoutinesState> emit) async {
     try {
       await _supabaseService.completeRoutine(event.id);
+      add(const LoadRoutines());
+    } catch (e) {
+      emit(RoutinesError(e.toString()));
+    }
+  }
+
+  // Implementasi snooze routine
+  Future<void> _onSnoozeRoutine(SnoozeRoutine event, Emitter<RoutinesState> emit) async {
+    try {
+      await _supabaseService.snoozeRoutine(event.id, event.days);
       add(const LoadRoutines());
     } catch (e) {
       emit(RoutinesError(e.toString()));

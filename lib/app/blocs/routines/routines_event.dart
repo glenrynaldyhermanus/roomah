@@ -48,6 +48,17 @@ class CompleteRoutine extends RoutinesEvent {
   List<Object?> get props => [id];
 }
 
+// Tambahkan event snooze untuk menunda jatuh tempo routine
+class SnoozeRoutine extends RoutinesEvent {
+  final String id;
+  final int days;
+
+  const SnoozeRoutine(this.id, {this.days = 1});
+
+  @override
+  List<Object?> get props => [id, days];
+}
+
 class ToggleRoutineActive extends RoutinesEvent {
   final String id;
 

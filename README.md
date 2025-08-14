@@ -92,26 +92,32 @@ NeumaToggle(
 
 ## 🚀 Fitur Utama
 
-### 1. Todo Management
+### 1. Today Dashboard (baru)
+
+- ✅ Ringkasan stat dinamis (Todo, Keuangan bulan ini, Kalender hari ini, Routines due hari ini)
+- ✅ Routines Hari Ini: complete dan snooze
+- ✅ To-Do aktif: toggle complete cepat
+
+### 2. Todo Management
 
 - ✅ CRUD operasi untuk todo
 - ✅ Mark as completed
 - ✅ Group by completion status
 
-### 2. Finance Tracking
+### 3. Finance Tracking
 
 - ✅ Input data keuangan
 - ✅ Toggle view (Finances/Budget)
 - ✅ Visual statistics
 
-### 3. Routine Management
+### 4. Routine Management
 
 - ✅ CRUD operasi untuk rutinitas
 - ✅ Kategori rutinitas
 - ✅ Frequency tracking
 - ✅ Completion tracking
 
-### 4. Calendar Integration
+### 5. Calendar Integration
 
 - ✅ Event management
 - ✅ Date-based views
@@ -135,6 +141,13 @@ NeumaToggle(
 2. Install dependencies: `flutter pub get`
 3. Setup Supabase configuration
 4. Run: `flutter run`
+
+## 📚 Dokumentasi
+
+- Roadmap: `docs/ROADMAP.md`
+- Screen Flow: `docs/SCREEN_FLOW.md`
+- Data Schema: `docs/DATA_SCHEMA.md`
+- Backlog: `docs/BACKLOG.md`
 
 ## 📝 License
 

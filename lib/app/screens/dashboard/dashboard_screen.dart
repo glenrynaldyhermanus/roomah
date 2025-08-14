@@ -4,7 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:myapp/app/blocs/routines/routines_bloc.dart';
 import 'package:myapp/app/blocs/routines/routines_event.dart';
 import 'package:myapp/app/blocs/routines/routines_state.dart';
+import 'package:myapp/app/blocs/todo/todo_bloc.dart';
+import 'package:myapp/app/blocs/finance/finance_bloc.dart';
+import 'package:myapp/app/blocs/calendar_data/calendar_data_bloc.dart';
 import 'package:myapp/app/models/routine.dart';
+import 'package:myapp/app/models/todo_item.dart';
+import 'package:myapp/app/models/finance.dart';
 import 'package:myapp/app/screens/ui_demo/ui_demo_screen.dart';
 import 'package:myapp/app/widgets/neuma_widgets.dart';
 
@@ -17,6 +22,16 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedViewIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    context.read<CalendarDataBloc>().add(FetchCalendarData(
+      DateTime.utc(now.year, now.month, 1),
+      DateTime.utc(now.year, now.month + 1, 0),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,23 +98,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Row(
               children: [
                 Expanded(
-                  child: _buildStatCard(
-                    'Todo',
-                    '5',
-                    '3 selesai',
-                    Icons.check_circle,
-                    Colors.green,
-                  ),
+                  child: _buildTodoStatCard(context),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildStatCard(
-                    'Keuangan',
-                    'Rp 2.5M',
-                    '+Rp 500K',
-                    Icons.account_balance_wallet,
-                    Colors.blue,
-                  ),
+                  child: _buildFinanceStatCard(context),
                 ),
               ],
             ),
@@ -107,23 +110,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Row(
               children: [
                 Expanded(
-                  child: _buildStatCard(
-                    'Kalender',
-                    '3',
-                    'acara hari ini',
-                    Icons.calendar_today,
-                    Colors.orange,
-                  ),
+                  child: _buildCalendarStatCard(context),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildStatCard(
-                    'Routines',
-                    '2',
-                    'due hari ini',
-                    Icons.repeat,
-                    Colors.purple,
-                  ),
+                  child: _buildRoutineStatCard(context),
                 ),
               ],
             ),
@@ -163,6 +154,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: todayRoutines.take(3).map((routine) => 
                       _buildRoutineCard(context, routine)
                     ).toList(),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+
+            const SizedBox(height: 24),
+
+            // To-Do Aktif Section
+            const Text(
+              'To-Do Aktif',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            BlocBuilder<TodoBloc, TodoState>(
+              builder: (context, state) {
+                if (state is TodoLoaded) {
+                  final active = state.todos;
+                  if (active.isEmpty) {
+                    return NeumaCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Tidak ada To-Do aktif',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: active.take(3).map((todo) => _buildTodoCard(context, todo)).toList(),
                   );
                 }
                 return const SizedBox.shrink();
@@ -326,6 +348,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
+            const SizedBox(width: 8),
+            NeumaButton(
+              onPressed: () {
+                context.read<RoutinesBloc>().add(SnoozeRoutine(routine.id));
+              },
+              child: const Icon(Icons.snooze, color: Colors.white, size: 16),
+            ),
+            const SizedBox(width: 8),
             NeumaButton(
               onPressed: () {
                 context.read<RoutinesBloc>().add(CompleteRoutine(routine.id));
@@ -379,6 +409,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  // Stat cards dinamis
+  Widget _buildTodoStatCard(BuildContext context) {
+    return BlocBuilder<TodoBloc, TodoState>(
+      builder: (context, state) {
+        if (state is TodoLoaded) {
+          final active = state.todos.length;
+          final completed = state.completedTodos.length;
+          return _buildStatCard('Todo', '$active', '$completed selesai', Icons.check_circle, Colors.green);
+        }
+        return _buildStatCard('Todo', '-', '', Icons.check_circle, Colors.green);
+      },
+    );
+  }
+
+  Widget _buildFinanceStatCard(BuildContext context) {
+    return BlocBuilder<FinanceBloc, FinanceState>(
+      builder: (context, state) {
+        if (state is FinanceLoaded) {
+          final now = DateTime.now();
+          final thisMonth = state.finances.where((f) => f.startDate.year == now.year && f.startDate.month == now.month);
+          final sum = thisMonth.fold<double>(0, (acc, f) => acc + f.amount);
+          return _buildStatCard('Keuangan', 'Rp ${sum.toStringAsFixed(0)}', '${thisMonth.length} catatan', Icons.account_balance_wallet, Colors.blue);
+        }
+        return _buildStatCard('Keuangan', '-', '', Icons.account_balance_wallet, Colors.blue);
+      },
+    );
+  }
+
+  Widget _buildCalendarStatCard(BuildContext context) {
+    return BlocBuilder<CalendarDataBloc, CalendarDataState>(
+      builder: (context, state) {
+        if (state is CalendarDataLoaded) {
+          final today = DateTime.now();
+          final eventsToday = state.events.where((e) {
+            if (e is Todo) {
+              return e.createdAt.year == today.year && e.createdAt.month == today.month && e.createdAt.day == today.day;
+            } else if (e is Finance) {
+              return e.startDate.year == today.year && e.startDate.month == today.month && e.startDate.day == today.day;
+            }
+            return false;
+          }).length;
+          return _buildStatCard('Kalender', '$eventsToday', 'acara hari ini', Icons.calendar_today, Colors.orange);
+        }
+        return _buildStatCard('Kalender', '-', 'acara hari ini', Icons.calendar_today, Colors.orange);
+      },
+    );
+  }
+
+  Widget _buildRoutineStatCard(BuildContext context) {
+    return BlocBuilder<RoutinesBloc, RoutinesState>(
+      builder: (context, state) {
+        if (state is RoutinesLoaded) {
+          final today = DateTime.now();
+          final dueToday = state.routines.where((r) => r.isActive && r.nextDueDate.year == today.year && r.nextDueDate.month == today.month && r.nextDueDate.day == today.day).length;
+          return _buildStatCard('Routines', '$dueToday', 'due hari ini', Icons.repeat, Colors.purple);
+        }
+        return _buildStatCard('Routines', '-', 'due hari ini', Icons.repeat, Colors.purple);
+      },
     );
   }
 
@@ -446,6 +537,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
             title,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Kartu To-Do ringkas untuk Today view
+  Widget _buildTodoCard(BuildContext context, Todo todo) {
+    return NeumaCard(
+      child: Row(
+        children: [
+          NeumaButton(
+            onPressed: () {
+              final updated = todo.copyWith(
+                isCompleted: !todo.isCompleted,
+                completedAt: !todo.isCompleted ? DateTime.now() : null,
+                clearCompletedAt: todo.isCompleted,
+              );
+              context.read<TodoBloc>().add(UpdateTodo(updated));
+            },
+            child: Icon(
+              todo.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: todo.isCompleted ? Colors.green : Colors.grey,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  todo.title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: todo.isCompleted ? Colors.grey[600] : Colors.black87,
+                    decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
+                  ),
+                ),
+                if (todo.description != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    todo.description!,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ],
       ),
