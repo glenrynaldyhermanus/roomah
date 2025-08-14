@@ -1,0 +1,11 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+-. Jangan ubah yang saya tidak minta ubah dan tidak ada improvisasi jika saya tidak minta.
+-. Jika ada rekomendasi atau perubahan di luar itu, tanyakan ke saya dulu.
+-. Untuk setiap pembuatan element cek di src/components apakah ada yang bisa di pakai, jangan buat sendiri.
+-. Untuk yang berhubungan dengan database. Check skema di database/schema.sql. Dan apabila skema tidak mendukung, silahkan suggest perubahan atau penambahan.
+-. Pastikan style dan theme halaman konsisten. Tidak mengubah style kecuali saya minta.
