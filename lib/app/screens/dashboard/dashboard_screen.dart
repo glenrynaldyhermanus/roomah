@@ -21,17 +21,24 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _selectedViewIndex = 0;
+     int _selectedViewIndex = 0;
+   final TextEditingController _quickAddController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    final now = DateTime.now();
-    context.read<CalendarDataBloc>().add(FetchCalendarData(
-      DateTime.utc(now.year, now.month, 1),
-      DateTime.utc(now.year, now.month + 1, 0),
-    ));
-  }
+     @override
+   void initState() {
+     super.initState();
+     final now = DateTime.now();
+     context.read<CalendarDataBloc>().add(FetchCalendarData(
+       DateTime.utc(now.year, now.month, 1),
+       DateTime.utc(now.year, now.month + 1, 0),
+     ));
+   }
+
+   @override
+   void dispose() {
+     _quickAddController.dispose();
+     super.dispose();
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +173,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const Text(
               'To-Do Aktif',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            NeumaCard(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: NeumaTextField.compact(
+                      controller: _quickAddController,
+                      hintText: 'Quick add To-Do...',
+                      icon: Icons.add_task,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  NeumaButton(
+                    onPressed: () {
+                      final text = _quickAddController.text.trim();
+                      if (text.isEmpty) return;
+                      final todo = Todo(
+                        id: DateTime.now().toIso8601String(),
+                        title: text,
+                        isCompleted: false,
+                        createdAt: DateTime.now(),
+                      );
+                      context.read<TodoBloc>().add(AddTodo(todo));
+                      _quickAddController.clear();
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Text('Add'),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             BlocBuilder<TodoBloc, TodoState>(

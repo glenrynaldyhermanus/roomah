@@ -54,7 +54,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   eventLoader: (day) {
                     return state.events.where((event) {
                       if (event is Todo) {
-                        return isSameDay(event.createdAt, day);
+                        final todoDate = event.dueDate ?? event.createdAt;
+                        return isSameDay(todoDate, day);
                       } else if (event is Finance) {
                         return isSameDay(event.startDate, day);
                       }

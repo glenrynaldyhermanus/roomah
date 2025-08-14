@@ -66,8 +66,7 @@ class SupabaseService {
     final data = await _client
         .from('todos')
         .select()
-        .gte('created_at', start.toIso8601String())
-        .lte('created_at', end.toIso8601String());
+        .or('and(due_date.gte.${start.toIso8601String()},due_date.lte.${end.toIso8601String()}),and(due_date.is.null,created_at.gte.${start.toIso8601String()},created_at.lte.${end.toIso8601String()})');
     return (data as List).map((json) => Todo.fromJson(json)).toList();
   }
 

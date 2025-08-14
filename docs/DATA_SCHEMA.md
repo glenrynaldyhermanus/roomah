@@ -4,8 +4,8 @@
   - id, email, username, createdAt
 
 - Todo
-  - id, title, description?, isCompleted, createdAt, completedAt?
-  - Next: dueDate?, assignedTo?, tags[]?
+  - id, title, description?, isCompleted, createdAt, completedAt?, dueDate?, priority (0=Low,1=Med,2=High)
+  - Next: assignedTo?, tags[]?
 
 - Finance
   - id, name, amount, startDate, endDate, createdAt

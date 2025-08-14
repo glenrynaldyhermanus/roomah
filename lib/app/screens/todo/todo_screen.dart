@@ -14,6 +14,8 @@ class TodoScreen extends StatefulWidget {
 }
 
 class TodoScreenState extends State<TodoScreen> {
+  int _sortIndex = 0; // 0: Created, 1: Due, 2: Priority
+
   @override
   Widget build(BuildContext context) {
     return NeumorphicBackground(
@@ -29,17 +31,43 @@ class TodoScreenState extends State<TodoScreen> {
               return const Center(child: CircularProgressIndicator());
             }
             if (state is TodoLoaded) {
+              final active = List<Todo>.from(state.todos);
+              switch (_sortIndex) {
+                case 1:
+                  active.sort((a, b) {
+                    final ad = a.dueDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+                    final bd = b.dueDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+                    return ad.compareTo(bd);
+                  });
+                  break;
+                case 2:
+                  active.sort((a, b) => b.priority.compareTo(a.priority));
+                  break;
+                default:
+                  active.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+              }
+
+              final completed = List<Todo>.from(state.completedTodos);
+
               return Column(
                 children: [
-                  Expanded(
-                    child: ListView(
-                      children:
-                          state.todos
-                              .map((todo) => _buildTodoItem(context, todo))
-                              .toList(),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: NeumaToggle(
+                      selectedIndex: _sortIndex,
+                      options: const ['Created', 'Due', 'Priority'],
+                      onChanged: (index) => setState(() => _sortIndex = index),
+                      height: 44,
+                      activeTextColor: Colors.white,
+                      inactiveTextColor: Colors.grey[700],
                     ),
                   ),
-                  if (state.completedTodos.isNotEmpty)
+                  Expanded(
+                    child: ListView(
+                      children: active.map((todo) => _buildTodoItem(context, todo)).toList(),
+                    ),
+                  ),
+                  if (completed.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -51,7 +79,7 @@ class TodoScreenState extends State<TodoScreen> {
                     child: ListView(
                       children: _buildCompletedGroups(
                         context,
-                        state.completedTodos,
+                        completed,
                       ),
                     ),
                   ),
@@ -103,22 +131,40 @@ class TodoScreenState extends State<TodoScreen> {
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: todo.isCompleted ? Colors.grey[600] : Colors.black87,
-                    decoration:
-                        todo.isCompleted ? TextDecoration.lineThrough : null,
+                    decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
                   ),
                 ),
-                if (todo.description != null) ...[
+                if (todo.description != null && todo.description!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     todo.description!,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
-                      decoration:
-                          todo.isCompleted ? TextDecoration.lineThrough : null,
+                      decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
                     ),
                   ),
                 ],
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    if (todo.dueDate != null) ...[
+                      const Icon(Icons.event, size: 14, color: Colors.blueGrey),
+                      const SizedBox(width: 4),
+                      Text(
+                        DateFormat.yMMMd().format(todo.dueDate!),
+                        style: TextStyle(fontSize: 12, color: Colors.blueGrey[700]),
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                    const Icon(Icons.flag, size: 14, color: Colors.orange),
+                    const SizedBox(width: 4),
+                    Text(
+                      ['Low', 'Med', 'High'][todo.priority.clamp(0, 2)],
+                      style: TextStyle(fontSize: 12, color: Colors.orange[700]),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -126,37 +172,36 @@ class TodoScreenState extends State<TodoScreen> {
             onPressed: () {
               showModalBottomSheet(
                 context: context,
-                builder:
-                    (context) => Container(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.edit),
-                            title: const Text('Edit'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              context.go('/todo/form', extra: todo);
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(
-                              Icons.delete,
-                              color: Colors.red,
-                            ),
-                            title: const Text(
-                              'Delete',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                              context.read<TodoBloc>().add(DeleteTodo(todo));
-                            },
-                          ),
-                        ],
+                builder: (context) => Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.edit),
+                        title: const Text('Edit'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          context.go('/todo/form', extra: todo);
+                        },
                       ),
-                    ),
+                      ListTile(
+                        leading: const Icon(
+                          Icons.delete,
+                          color: Colors.red,
+                        ),
+                        title: const Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          context.read<TodoBloc>().add(DeleteTodo(todo));
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
             child: const Icon(Icons.more_vert, size: 20),
@@ -173,9 +218,7 @@ class TodoScreenState extends State<TodoScreen> {
     final groups = <String, List<Todo>>{};
     for (final todo in completedTodos) {
       final date = DateFormat.yMMMd().format(todo.completedAt!);
-      if (groups[date] == null) {
-        groups[date] = [];
-      }
+      groups[date] ??= [];
       groups[date]!.add(todo);
     }
 
