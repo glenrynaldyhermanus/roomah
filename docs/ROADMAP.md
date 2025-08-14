@@ -3,16 +3,18 @@
 - Fase 1 (Fondasi, 2–4 minggu)
   - Today view (dashboard) dengan stat dinamis: Todo, Routines, Kalender, Keuangan
   - Recurrence sederhana + snooze (sudah ditambahkan event dan service)
-  - Quick add: tambah To-Do dari dashboard
+  - Quick add: tambah To-Do dari dashboard (done)
   - Notifikasi dasar (local): daily reminder (tbd)
   - Sinkron kalender internal (agregasi data app) — eksternal 2-arah nanti
+  - Todo: due date + priority (done)
+  - Calendar: CRUD `calendar_events` dasar (done)
 
 - Fase 2 (Rumah & Belanja, 3–5 minggu)
   - To-buy list bersama per-toko, template belanja
   - Pantry ringan (stok minimum, kedaluwarsa sederhana)
   - Perawatan rumah (AC, galon, kendaraan) + histori
   - Tugas dari chat (parsing slash command) — MVP
-  - Roles/visibility: item bersama vs pribadi
+  - Roles/visibility: item bersama vs pribadi (DB done, UI tbd)
 
 - Fase 3 (Kenyamanan & AI, 4–6 minggu)
   - Automations: trigger (waktu, stok habis) → action (buat tugas/pengingat)

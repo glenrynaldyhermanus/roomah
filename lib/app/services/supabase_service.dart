@@ -3,6 +3,7 @@ import 'package:myapp/app/models/todo_item.dart';
 import 'package:myapp/app/models/finance.dart';
 import 'package:myapp/app/models/routine.dart';
 import 'package:myapp/app/models/routine_category.dart';
+import 'package:myapp/app/models/calendar_event.dart';
 
 class SupabaseService {
   final SupabaseClient _client = Supabase.instance.client;
@@ -304,5 +305,27 @@ class SupabaseService {
       }
       rethrow;
     }
+  }
+
+  // Calendar Events CRUD
+  Future<List<CalendarEvent>> getCalendarEventsByDateRange(DateTime start, DateTime end) async {
+    final data = await _client
+        .from('calendar_events')
+        .select()
+        .gte('start_at', start.toIso8601String())
+        .lte('start_at', end.toIso8601String());
+    return (data as List).map((json) => CalendarEvent.fromJson(json)).toList();
+  }
+
+  Future<void> addCalendarEvent(CalendarEvent event) async {
+    await _client.from('calendar_events').insert(event.toJson());
+  }
+
+  Future<void> updateCalendarEvent(CalendarEvent event) async {
+    await _client.from('calendar_events').update(event.toJson()).eq('id', event.id);
+  }
+
+  Future<void> deleteCalendarEvent(String id) async {
+    await _client.from('calendar_events').delete().eq('id', id);
   }
 }

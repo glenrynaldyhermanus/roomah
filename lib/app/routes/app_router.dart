@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/app/models/todo_item.dart';
 import 'package:myapp/app/models/routine.dart';
+import 'package:myapp/app/models/calendar_event.dart';
 import 'package:myapp/app/screens/calendar/calendar_screen.dart';
+import 'package:myapp/app/screens/calendar/calendar_event_form_screen.dart';
 import 'package:myapp/app/screens/dashboard/dashboard_screen.dart';
 import 'package:myapp/app/screens/finance/finance_screen.dart';
 import 'package:myapp/app/screens/finance/finance_form_screen.dart';
@@ -82,6 +84,15 @@ final router = GoRouter(
           builder: (context, state) {
             return const CalendarScreen();
           },
+          routes: [
+            GoRoute(
+              path: 'event-form',
+              builder: (context, state) {
+                final event = state.extra as CalendarEvent?;
+                return CalendarEventFormScreen(event: event);
+              },
+            ),
+          ],
         ),
       ],
     ),

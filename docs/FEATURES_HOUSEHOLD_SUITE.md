@@ -1,0 +1,22 @@
+# Fitur Pendukung Rumah Tangga (Saran)
+
+- Household & Roles
+  - Buat household, undang anggota, atur peran (owner/admin/member)
+  - Visibility item berdasarkan `household_id`
+- Pembagian Tugas Rutin
+  - Assign routine ke beberapa anggota, poin/rotasi fairness
+  - Log aksi (complete/snooze/skip) untuk histori
+- To-Buy & Pantry
+  - Daftar belanja per-toko, template belanja, priority
+  - Pantry stok, low-stock dan expiry reminder
+- Perawatan Rumah
+  - Jadwal servis (AC, kendaraan, galon), histori, pengingat periodik
+- Tagihan & Langganan
+  - Recurring bills, due date, split biaya, notifikasi
+- Meal Planning
+  - Menu mingguan, resep, auto-generate belanja dari rencana
+- Calendar Lanjutan
+  - CRUD `calendar_events`, recurring events, color per anggota, ulang tahun
+- Reminders & Digest
+  - Tabel `reminders` untuk Todo/Routine/Event
+  - Daily/weekly digest: ringkasan dan pengingat
