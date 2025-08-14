@@ -280,4 +280,30 @@ class SupabaseService {
       rethrow;
     }
   }
+
+  // Menunda rutinitas sejumlah hari dari next_due_date saat ini
+  Future<void> snoozeRoutine(String id, int days) async {
+    try {
+      final routine = await _client
+          .from('routines')
+          .select('next_due_date')
+          .eq('id', id)
+          .single();
+
+      final currentNext = DateTime.parse(routine['next_due_date'].toString());
+      final updated = currentNext.add(Duration(days: days));
+
+      await _client
+          .from('routines')
+          .update({'next_due_date': updated.toIso8601String()})
+          .eq('id', id)
+          .timeout(const Duration(seconds: 10));
+    } catch (e) {
+      if (e.toString().contains('rrno = 7') || 
+          e.toString().contains('no address associated with hostname')) {
+        throw Exception('Network error: Unable to resolve hostname. Please check your internet connection.');
+      }
+      rethrow;
+    }
+  }
 }
