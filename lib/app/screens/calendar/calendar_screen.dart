@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/app/blocs/calendar_data/calendar_data_bloc.dart';
+import 'package:myapp/app/services/supabase_service.dart';
 import 'package:myapp/app/models/todo_item.dart';
 import 'package:myapp/app/models/finance.dart';
+import 'package:myapp/app/models/calendar_event.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:go_router/go_router.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -31,6 +34,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calendar'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              context.push('/calendar/event-form');
+            },
+          ),
+        ],
       ),
       body: BlocBuilder<CalendarDataBloc, CalendarDataState>(
         builder: (context, state) {
@@ -54,9 +65,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   eventLoader: (day) {
                     return state.events.where((event) {
                       if (event is Todo) {
-                        return isSameDay(event.createdAt, day);
+                        final todoDate = event.dueDate ?? event.createdAt;
+                        return isSameDay(todoDate, day);
                       } else if (event is Finance) {
                         return isSameDay(event.startDate, day);
+                      } else if (event is CalendarEvent) {
+                        return isSameDay(event.startAt, day);
                       }
                       return false;
                     }).toList();
@@ -77,17 +91,37 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     itemCount: state.events.length,
                     itemBuilder: (context, index) {
                       final event = state.events[index];
-                      if (event is Todo) {
+                                              if (event is Todo) {
                         return ListTile(
                           title: Text('Todo: ${event.title}'),
-                          subtitle: Text(event.createdAt.toString()),
+                          subtitle: Text((event.dueDate ?? event.createdAt).toString()),
                         );
                       } else if (event is Finance) {
                         return ListTile(
                           title: Text('Finance: ${event.name}'),
-                          subtitle: Text(
-                              '${event.amount} - ${event.startDate}'),
+                          subtitle: Text('${event.amount} - ${event.startDate}'),
                           trailing: Text('Budget'),
+                        );
+                      } else if (event is CalendarEvent) {
+                        return ListTile(
+                          title: Text('Event: ${event.title}'),
+                          subtitle: Text('${event.startAt}${event.allDay ? ' (All day)' : ''}'),
+                          onTap: () {
+                            context.push('/calendar/event-form', extra: event);
+                          },
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.redAccent),
+                            onPressed: () async {
+                              final svc = RepositoryProvider.of<SupabaseService>(context);
+                              await svc.deleteCalendarEvent(event.id);
+                              final now = _focusedDay;
+                              // refresh current month
+                              context.read<CalendarDataBloc>().add(FetchCalendarData(
+                                DateTime.utc(now.year, now.month, 1),
+                                DateTime.utc(now.year, now.month + 1, 0),
+                              ));
+                            },
+                          ),
                         );
                       }
                       return Container();
