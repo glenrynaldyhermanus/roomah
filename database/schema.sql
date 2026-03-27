@@ -5,7 +5,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users Table
-CREATE TABLE public.users (
+CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
     email VARCHAR NOT NULL UNIQUE,
     username VARCHAR UNIQUE,
@@ -14,9 +14,32 @@ CREATE TABLE public.users (
     updated_at TIMESTAMP WITH TIME ZONE,
     updated_by UUID REFERENCES public.users(id),
     deleted_at TIMESTAMP WITH TIME ZONE,
-    deleted_by UUID REFERENCES public.users(id)
+    deleted_by UUID REFERENCES public.users(id),
+    full_name VARCHAR
 );
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+-- Trigger to sync auth.users to public.users
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.users (id, email, full_name)
+    VALUES (
+        NEW.id, 
+        NEW.email, 
+        NEW.raw_user_meta_data->>'full_name'
+    )
+    ON CONFLICT (id) DO UPDATE SET
+        email = EXCLUDED.email,
+        full_name = EXCLUDED.full_name;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
 -- Todos Table
 CREATE TABLE public.todos (
