@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../src/core/theme/app_colors.dart';
 import '../../src/services/supabase_service.dart';
@@ -72,7 +73,7 @@ class _SplashPageState extends State<SplashPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Simple Logo Placeholder
-            Icon(Icons.home_rounded, size: 80, color: AppColors.primaryPink),
+            Icon(LucideIcons.house, size: 80, color: AppColors.primaryPink),
             SizedBox(height: 24),
             CircularProgressIndicator(color: AppColors.primaryPink),
           ],

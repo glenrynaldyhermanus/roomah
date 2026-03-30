@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../src/core/theme/app_colors.dart';
 import '../../../src/core/theme/app_text_styles.dart';
+import '../../../src/widgets/roomah_back_leading.dart';
 import '../../../src/shared/glass_container.dart';
 import '../../../src/shared/custom_text_field.dart';
 import '../../../src/services/supabase_service.dart';
@@ -65,10 +66,8 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-          onPressed: () => Navigator.pop(context),
-        ),
+        centerTitle: false,
+        leading: roomahChevronBackButton(context),
       ),
       extendBodyBehindAppBar: true,
       body: Stack(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../src/core/theme/app_colors.dart';
 import '../../../src/core/theme/app_text_styles.dart';
+import '../../../src/widgets/roomah_back_app_bar.dart';
 import '../../../src/shared/glass_container.dart';
 import '../../../src/shared/custom_text_field.dart';
 import '../../../src/services/supabase_service.dart';
@@ -84,16 +85,8 @@ class _AddEventPageState extends State<AddEventPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text("New Event", style: AppTextStyles.cardTitle),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      backgroundColor: AppColors.backgroundLight,
+      appBar: roomahSolidBackAppBar(context, title: 'New Event'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: GlassContainer(

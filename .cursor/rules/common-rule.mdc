@@ -1,11 +1,13 @@
 ---
-description:
+description: Aturan umum Roomah — scope perubahan, UI, komponen, skema DB.
 globs:
 alwaysApply: true
 ---
 
--. Jangan ubah yang saya tidak minta ubah dan tidak ada improvisasi jika saya tidak minta.
--. Jika ada rekomendasi atau perubahan di luar itu, tanyakan ke saya dulu.
--. Untuk setiap pembuatan element cek di src/components apakah ada yang bisa di pakai, jangan buat sendiri.
--. Untuk yang berhubungan dengan database. Check skema di database/schema.sql. Dan apabila skema tidak mendukung, silahkan suggest perubahan atau penambahan.
--. Pastikan style dan theme halaman konsisten. Tidak mengubah style kecuali saya minta.
+- Jangan ubah yang saya tidak minta ubah dan tidak ada improvisasi jika saya tidak minta.
+- Jika ada rekomendasi atau perubahan di luar itu, tanyakan ke saya dulu.
+- Untuk setiap pembuatan element cek di src/components apakah ada yang bisa di pakai, jangan buat sendiri.
+- Untuk yang berhubungan dengan database. Check skema di docs/schema.sql. Dan apabila skema tidak mendukung, silahkan suggest perubahan atau penambahan.
+- Pastikan style dan theme halaman konsisten. Tidak mengubah style kecuali saya minta.
+- Untuk ikon UI gunakan `lucide_icons_flutter` (`LucideIcons` + `import 'package:lucide_icons_flutter/lucide_icons.dart'`). Jangan menambahkan ikon baru lewat `Icons.*`, `CupertinoIcons.*`, paket ikon lain, atau aset ikon tambahan kecuali saya minta pengecualian.
+- **Copy / bahasa UI:** satu suara di seluruh app — fun, casual, suggestive, seperti asisten yang mendampingi (*you/your*, kadang *we*; arahkan halus). Default **English**; **salam / greeting** boleh campur Indonesia bila selaras (mis. waktu singkat + “Teman SeRoomah”). Label **navigasi utama / menu** prefer **satu kata** supaya tidak mudah patah dua baris. Tetap jelas untuk angka dan status; detail teknis error ke log/debug, bukan teks utama ke pengguna.

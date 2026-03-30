@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../src/core/theme/app_colors.dart';
 import 'home_dashboard.dart';
 import '../events/event_list/event_list_page.dart';
-import '../shopping/list/shopping_list_page.dart';
+import '../cooking/dashboard/cooking_page.dart';
+import '../randomizer/dice/dice_page.dart';
 
 class MainDashboard extends StatefulWidget {
   const MainDashboard({super.key});
@@ -14,17 +16,40 @@ class MainDashboard extends StatefulWidget {
 class _MainDashboardState extends State<MainDashboard> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const HomeDashboard(),
-    const EventListPage(),
-    const ShoppingListPage(),
-    const ShoppingListPage(), // Placeholder for Messages
-  ];
+  late List<Widget> _pages;
+
+  List<Widget> _createPages() => [
+        HomeDashboard(onOpenCalendar: () => setState(() => _currentIndex = 1)),
+        const EventListPage(),
+        const CookingPage(),
+        const DicePage(),
+      ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = _createPages();
+  }
+
+  /// Hot reload keeps [State] but does not re-run [initState]; rebuild tabs so
+  /// length matches [BottomNavigationBar] and clamp index (e.g. 3 vs 3 items).
+  @override
+  void reassemble() {
+    super.reassemble();
+    _pages = _createPages();
+    _currentIndex = _currentIndex.clamp(0, _pages.length - 1);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final i = _currentIndex.clamp(0, _pages.length - 1);
+    if (i != _currentIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _currentIndex = i);
+      });
+    }
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: _pages[i],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.backgroundLight,
@@ -36,7 +61,7 @@ class _MainDashboardState extends State<MainDashboard> {
           ),
         ),
         child: BottomNavigationBar(
-          currentIndex: _currentIndex,
+          currentIndex: i,
           onTap: (index) {
             setState(() {
               _currentIndex = index;
@@ -52,20 +77,20 @@ class _MainDashboardState extends State<MainDashboard> {
           showUnselectedLabels: true,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard),
-              label: 'Dashboard',
+              icon: Icon(LucideIcons.house),
+              label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: 'Calendar',
+              icon: Icon(LucideIcons.calendarDays),
+              label: 'Plans',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.list_alt),
-              label: 'Lists',
+              icon: Icon(LucideIcons.chefHat),
+              label: 'Cooking',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_outline),
-              label: 'Messages',
+              icon: Icon(LucideIcons.dices),
+              label: 'Dice',
             ),
           ],
         ),

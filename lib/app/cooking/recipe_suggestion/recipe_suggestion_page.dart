@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../src/core/theme/app_colors.dart';
 import '../../../src/core/theme/app_text_styles.dart';
+import '../../../src/widgets/roomah_back_app_bar.dart';
 import '../../../src/shared/glass_container.dart';
 
 class RecipeSuggestionPage extends StatelessWidget {
@@ -9,16 +11,8 @@ class RecipeSuggestionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text("AI Suggestions", style: AppTextStyles.cardTitle),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      backgroundColor: AppColors.backgroundLight,
+      appBar: roomahSolidBackAppBar(context, title: 'AI Suggestions'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -30,7 +24,7 @@ class RecipeSuggestionPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.auto_awesome, color: AppColors.accentPink),
+                      const Icon(LucideIcons.sparkles, color: AppColors.accentPink),
                       const SizedBox(width: 8),
                       Text("Top Pick For You", style: AppTextStyles.badgeText.copyWith(color: AppColors.accentPink)),
                     ],
@@ -42,7 +36,7 @@ class RecipeSuggestionPage extends StatelessWidget {
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Center(child: Icon(Icons.image, size: 50, color: Colors.grey)),
+                    child: const Center(child: Icon(LucideIcons.image, size: 50, color: Colors.grey)),
                   ),
                   const SizedBox(height: 16),
                   Text("Spicy Chicken Pasta", style: AppTextStyles.headerMedium),

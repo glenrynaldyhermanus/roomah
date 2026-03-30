@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../src/core/theme/app_colors.dart';
 import '../../../src/core/theme/app_text_styles.dart';
+import '../../../src/widgets/roomah_back_app_bar.dart';
 import '../../../src/shared/glass_container.dart';
-import '../../../src/shared/custom_text_field.dart';
 import '../../../src/services/supabase_service.dart';
 
 class ShoppingListPage extends StatefulWidget {
@@ -105,7 +106,9 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold( // Added Scaffold to support body
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      appBar: roomahSolidBackAppBar(context, title: 'Shopping List'),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: AppColors.primaryPink))
           : SingleChildScrollView(
@@ -113,8 +116,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Shopping List", style: AppTextStyles.headerMedium),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 8),
                   
                   // Add Item Input
                   GlassContainer(
@@ -132,7 +134,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.add_circle, color: AppColors.primaryPink),
+                          icon: const Icon(LucideIcons.plusCircle, color: AppColors.primaryPink),
                           onPressed: _handleAddItem,
                         ),
                       ],
@@ -165,7 +167,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 20),
                               color: Colors.red.withOpacity(0.8),
-                              child: const Icon(Icons.delete, color: Colors.white),
+                              child: const Icon(LucideIcons.trash2, color: Colors.white),
                             ),
                             onDismissed: (_) => _handleDeleteItem(item['id']),
                             child: Padding(

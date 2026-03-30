@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../src/core/theme/app_colors.dart';
 import '../../../src/core/theme/app_text_styles.dart';
+import '../../../src/widgets/roomah_back_app_bar.dart';
 import '../../../src/shared/glass_container.dart';
 import '../../../src/shared/custom_text_field.dart';
 import '../../../src/services/supabase_service.dart';
@@ -86,15 +87,9 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text("Invite Members", style: AppTextStyles.cardTitle),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: roomahTransparentBackAppBar(
+        context,
+        title: 'Invite Members',
         actions: [
           TextButton(
             onPressed: _navigateToDashboard,
@@ -161,7 +156,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
                       }),
                       TextButton.icon(
                         onPressed: _addEmailField,
-                        icon: const Icon(Icons.add, color: AppColors.accentPink),
+                        icon: const Icon(LucideIcons.plus, color: AppColors.accentPink),
                         label: Text(
                           "Add Another Member",
                           style: AppTextStyles.bodyRegular.copyWith(color: AppColors.accentPink),
